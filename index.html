@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sigma Wash Booking</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --panel: #ffffff;
+      --panel-soft: #fbfbfd;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: #e5e5e7;
+      --blue: #0071e3;
+      --blue-hover: #0077ed;
+      --sidebar-width: 290px;
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      --max-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--line);
+      padding: 28px 20px 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-brand {
+      padding: 8px 10px 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+
+    .sidebar-copy {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.96rem;
+      padding: 0 10px;
+      margin-bottom: 22px;
+    }
+
+    .sidebar-group {
+      margin-bottom: 22px;
+    }
+
+    .sidebar-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .sidebar-nav a {
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 0.98rem;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .sidebar-nav a:hover {
+      background: #f0f3f6;
+      color: var(--blue);
+      transform: translateX(2px);
+    }
+
+    .sidebar-card {
+      margin-top: 26px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7f7fa 100%);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .sidebar-card a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: rgba(245, 245, 247, 0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .topbar-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .menu-toggle {
+      display: none;
+      border: 0;
+      background: #000;
+      color: #fff;
+      border-radius: 999px;
+      width: 42px;
+      height: 42px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .brand-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .top-logo {
+      height: 88px;
+      width: auto;
+      display: block;
+    }
+
+    .sidebar-logo {
+      display: block;
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      margin: 0 auto 14px;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: flex-end;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 500;
+    }
+
+    .menu a:hover {
+      color: var(--text);
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 34px 28px 46px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 28px;
+      padding: 34px 0 40px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.7rem, 6vw, 5.25rem);
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+      font-weight: 700;
+      max-width: 8ch;
+    }
+
+    .hero-copy p {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.65;
+      max-width: 44ch;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .hero-links a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .hero-links a:hover {
+      color: var(--blue-hover);
+    }
+
+    .glass-card {
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .glass-card h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      letter-spacing: -0.04em;
+    }
+
+    .glass-card .subtext {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 54ch;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field-note {
+      margin-top: -2px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .discount-status {
+      min-height: 20px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-top: 2px;
+    }
+
+    .price-summary {
+      margin-top: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .discount-apply-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .discount-apply-row input {
+      flex: 1;
+    }
+
+    .discount-apply-button {
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      appearance: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(0, 113, 227, 0.55);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .radio-group {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .addon-group {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .radio-card {
+      position: relative;
+      display: block;
+      cursor: pointer;
+    }
+
+    .radio-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-card span {
+      display: block;
+      position: relative;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 16px 18px;
+      min-height: 84px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .radio-price {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0071e3;
+    }
+
+    .radio-card small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .radio-card input:checked + span {
+      border-color: rgba(0, 113, 227, 0.6);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      background: #f5f9ff;
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .button,
+    .secondary-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .button {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .button:hover {
+      background: var(--blue-hover);
+      transform: translateY(-1px);
+    }
+
+    .secondary-button {
+      background: #f2f2f5;
+      color: var(--text);
+    }
+
+    .secondary-button:hover {
+      background: #e9e9ee;
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      background: #bfc7d1;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.85;
+    }
+
+    .status {
+      min-height: 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .service-grid,
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .mini-card {
+      background: linear-gradient(180deg, #ffffff 0%, #fafafd 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .mini-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+    }
+
+    .mini-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .booking-bottom {
+      margin-top: 30px;
+    }
+
+    .footer-space {
+      height: 24px;
+    }
+
+    .overlay {
+      display: none;
+    }
+
+    .terms-box {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid #d9d9de;
+      border-radius: 16px;
+    }
+
+    .terms-box input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      margin-top: 3px;
+      border: 2px solid #0071e3;
+      border-radius: 4px;
+      background: #fff;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .terms-box input[type="checkbox"]::after {
+      content: "";
+      width: 5px;
+      height: 10px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg) scale(0);
+      transition: transform 0.15s ease;
+      margin-top: -1px;
+    }
+
+    .terms-box input[type="checkbox"]:checked {
+      background: #0071e3;
+      border-color: #0071e3;
+    }
+
+    .terms-box input[type="checkbox"]:checked::after {
+      transform: rotate(45deg) scale(1);
+    }
+
+    .terms-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #6e6e73;
+    }
+
+    .terms-link {
+      color: #0071e3;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+    }
+
+    .terms-modal,
+    .confirmation-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+    }
+
+    .terms-modal.show,
+    .confirmation-modal.show {
+      display: block;
+    }
+
+    .terms-overlay,
+    .confirmation-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .terms-content,
+    .confirmation-content {
+      position: relative;
+      width: min(700px, calc(100% - 30px));
+      max-height: 85vh;
+      overflow-y: auto;
+      margin: 5vh auto 0;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .terms-content h3,
+    .confirmation-content h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .terms-content p,
+    .terms-content li,
+    .confirmation-content p {
+      color: #6e6e73;
+      line-height: 1.6;
+    }
+
+    .close-terms,
+    .close-confirmation {
+      float: right;
+      border: none;
+      background: #f2f2f5;
+      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .confirmation-message {
+      background: #f8f9fb;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      white-space: pre-line;
+      line-height: 1.65;
+      color: var(--text);
+      margin-top: 12px;
+    }
+
+    .confirmation-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 1180px) {
+      .service-grid,
+      .info-grid,
+      .radio-group {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        display: none;
+      }
+
+      .top-logo {
+        height: 70px;
+      }
+
+      .overlay.show {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(29, 29, 31, 0.26);
+        z-index: 950;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page,
+      .topbar-inner {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .form-grid,
+      .service-grid,
+      .info-grid,
+      .radio-group,
+      .addon-group {
+        grid-template-columns: 1fr;
+      }
+
+      .glass-card,
+      .mini-card {
+        border-radius: 24px;
+      }
+
+      .actions,
+      .confirmation-actions {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .discount-apply-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .discount-apply-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="transparent-logo.png" alt="Sigma Wash logo" class="sidebar-logo" />
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-label">Explore</div>
+        <nav class="sidebar-nav">
+          <a href="#resources">How It Works</a>
+          <a href="contact.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-label">Booking</div>
+        <nav class="sidebar-nav">
+          <a href="#services">Our Services</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-card">
+        <strong>Need help booking?</strong>
+        <a href="#booking">Go to booking →</a>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="topbar-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Open sidebar">☰</button>
+            <a href="#" class="brand-wrap" aria-label="Sigma Wash home">
+              <img src="transparent-logo.png" alt="Sigma Wash logo" class="top-logo" />
+              <div class="brand"></div>
+            </a>
+          </div>
+          <nav class="menu" aria-label="Top navigation">
+            <a href="#services">Packages</a>
+            <a href="contact.html">Contact</a>
+            <a href="#booking">Book</a>
+          </nav>
+        </div>
+      </header>
+
+      <div class="page">
+        <section class="hero">
+          <div class="hero-copy">
+            <h1>An experience unlike any other.</h1>
+            <p>
+              We work on your schedule. Tell us where your vehicle is located and our team is on it.
+            </p>
+            <div class="hero-links">
+              <a href="#booking">Book Your Wash →</a>
+            </div>
+            <div class="hero-links">
+              <a href="contact.html">Schedule By Phone →</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass-card" id="resources">
+          <h2>How It Works</h2>
+          <p class="subtext">A simple mobile car wash experience designed for convenience.</p>
+          <div class="info-grid">
+            <div class="mini-card">
+              <h3>You Book</h3>
+              <p>Schedule a convenient time below to have your vehicle cleaned.</p>
+            </div>
+            <div class="mini-card">
+              <h3>We Clean</h3>
+              <p>A hassle free, minimal contact experience so that you can focus on what's important.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass-card" id="services">
+          <h2>Our Services</h2>
+          <p class="subtext">Choose from one of the service offerings.</p>
+          <div class="service-grid">
+            
+            <div class="mini-card">
+              <h3>Exterior Fresh</h3>
+              <p>A bumper to bumper wash with an underbody spray and a tire shine at the end. <span id="serviceCardExteriorPrice">$11.65</span></p>
+            </div>
+            
+            <div class="mini-card">
+              <h3>Interior Fresh</h3>
+              <p>Total car vacuum, all window wipe down, dashboard and center console cleaning. <span id="serviceCardInteriorPrice">$26.30</span></p>
+           </div>
+            
+            <div class="mini-card">
+              <h3>Total Wash</h3>
+              <p>Our full package in one convenient visit. <span id="serviceCardTotalPrice">$37.95</span></p>
+            </div>
+            
+  
+          <div class="mini-card">
+              <h3>Add-Ons</h3>
+             <p>Trunk $2</p>
+            </div>
+          </div>
+          </div>
+        </section>
+
+        <section class="glass-card booking-bottom" id="booking">
+          <h2>Book a Sigma Wash</h2>
+          <p class="subtext">
+            Enter your details below. Payment is collected after the service is completed. Accepted payment methods are cash, Apple Pay, and Venmo.
+          </p>
+
+          <form
+            id="appointmentForm"
+            method="post"
+            target="hiddenSubmitFrame"
+            action="https://script.google.com/macros/s/AKfycbwyx5yo6yGJEpIy14tRsRJxJSBV3dydz8-B208-EMqyuN9F_PRe28RUv3ggew1NoXZg/exec"
+          >
+            <div class="form-grid">
+              <input type="hidden" id="customerName" name="customerName" />
+
+              <div class="field">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" autocomplete="given-name" required />
+              </div>
+
+              <div class="field">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" autocomplete="family-name" required />
+              </div>
+
+              <div class="field">
+                <label for="phoneNumber">Phone Number</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" inputmode="tel" autocomplete="tel" required />
+              </div>
+
+              <div class="field">
+                <label for="vehicleColor">Car Color</label>
+                <input type="text" id="vehicleColor" name="vehicleColor" placeholder="Example: Black" required />
+              </div>
+
+              <div class="field">
+                <label for="vehicleMake">Car Make</label>
+                <input type="text" id="vehicleMake" name="vehicleMake" list="vehicleMakeSuggestions" placeholder="Example: Toyota" autocomplete="off" required />
+                <datalist id="vehicleMakeSuggestions"></datalist>
+              
+              </div>
+
+              <div class="field">
+                <label for="vehicleModel">Car Model</label>
+                <input type="text" id="vehicleModel" name="vehicleModel" list="vehicleModelSuggestions" placeholder="Example: Camry" autocomplete="off" required />
+                <datalist id="vehicleModelSuggestions"></datalist>
+              
+              </div>
+
+              <div class="field">
+                <label for="streetAddress">Street Address *</label>
+                <input type="text" id="streetAddress" name="streetAddress" placeholder="123 Main St" autocomplete="address-line1" required />
+              </div>
+
+              <div class="field">
+                <label for="city">City *</label>
+                <input type="text" id="city" name="city" placeholder="Chicago" autocomplete="address-level2" required />
+              </div>
+
+              <div class="field">
+                <label for="state">State *</label>
+                <input type="text" id="state" name="state" placeholder="IL" autocomplete="address-level1" maxlength="2" required />
+              </div>
+
+              <div class="field">
+                <label for="zipCode">Zip Code *</label>
+                <input type="text" id="zipCode" name="zipCode" placeholder="60601" inputmode="numeric" autocomplete="postal-code" required />
+              </div>
+
+              <div class="field full">
+                <input type="hidden" id="address" name="address" />
+               
+              </div>
+
+              <div class="field">
+                <label for="appointmentDate">Date</label>
+                <input type="date" id="appointmentDate" name="appointmentDate" required />
+              </div>
+
+              <div class="field">
+                <label for="appointmentTime">Time</label>
+                <select id="appointmentTime" name="appointmentTime" required>
+                  <option value="">Select a time</option>
+                </select>
+               
+              </div>
+
+              
+              <div class="field full">
+                <label for="discountCodeInput">Discount Code</label>
+                <div class="discount-apply-row">
+                  <input
+                    type="text"
+                    id="discountCodeInput"
+                    name="discountCodeInput"
+                    placeholder="Enter discount code"
+                    autocomplete="off"
+                  />
+                  <button type="button" class="secondary-button discount-apply-button" id="applyDiscountButton">Apply</button>
+                </div>
+                <div class="discount-status" id="discountMessage"></div>
+                <input type="hidden" id="enteredDiscountCode" name="enteredDiscountCode" value="" />
+                <input type="hidden" id="discountCode" name="discountCode" value="" />
+                <input type="hidden" id="discountPercentage" name="discountPercentage" value="" />
+                <input type="hidden" id="originalPrice" name="originalPrice" value="" />
+                <input type="hidden" id="discountedPrice" name="discountedPrice" value="" />
+              </div>
+
+              <div class="field full">
+                <label>Wash Package</label>
+                <div class="radio-group">
+                  <label class="radio-card">
+                    <input type="radio" name="serviceType" value="Exterior Only" required />
+                    <span>
+                      <strong class="radio-price" id="radioExteriorPrice">$11.65</strong>
+                      Exterior Only
+                      <small>Mobile exterior wash</small>
+                    </span>
+                  </label>
+
+                  <label class="radio-card">
+                    <input type="radio" name="serviceType" value="Interior Only" required />
+                    <span>
+                      <strong class="radio-price" id="radioInteriorPrice">$26.30</strong>
+                      Interior Only
+                      <small>Interior cleaning service</small>
+                    </span>
+                  </label>
+
+                  <label class="radio-card">
+                    <input type="radio" name="serviceType" value="Exterior / Interior" required />
+                    <span>
+                      <strong class="radio-price" id="radioTotalPrice">$37.95</strong>
+                      Exterior / Interior
+                      <small>Complete mobile clean</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="field full">
+                <label>Add-Ons</label>
+                <div class="addon-group">
+                
+
+                  <label class="radio-card">
+                    <input type="checkbox" name="addOns" value="Trunk ($2)" />
+                    <span>
+                      <strong class="radio-price">$2</strong>
+                      Trunk
+                      <small>Add trunk cleaning</small>
+                    </span>
+                  </label>
+                </div>
+                <div class="field-note price-summary" id="priceSummary"></div>
+                <input type="hidden" id="selectedAddOns" name="selectedAddOns" value="" />
+                <input type="hidden" id="confirmationNumber" name="confirmationNumber" value="" />
+              </div>
+
+              <div class="field full">
+                <div class="terms-box">
+                  <input type="checkbox" id="agreeTerms" name="agreeTerms" required />
+                  <div class="terms-text">
+                    I agree to the
+                    <button type="button" class="terms-link" id="openTerms">
+                      Terms & Conditions / Service Waiver
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field full">
+                <div class="actions">
+                  <button type="submit" class="button" id="submitButton" disabled>Book Now</button>
+                  <div class="status" id="statusMessage"></div>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <iframe name="hiddenSubmitFrame" title="Hidden form submit frame" style="display:none;"></iframe>
+        </section>
+
+        <div class="footer-space"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="terms-modal" id="termsModal">
+    <div class="terms-overlay" id="termsOverlay"></div>
+
+    <div class="terms-content">
+      <button type="button" class="close-terms" id="closeTerms">✕</button>
+
+      <h3>Service Terms & Waiver</h3>
+      <p>By checking this box, you (“Customer”) acknowledge and agree to the following terms:</p>
+      <ul>
+        <li>You grant Quantitative Midwest, doing business as Quant MW and Sigma Wash (“Company”) permission to enter and remain on your property at the provided service address for the purpose of performing the requested services.</li>
+        <li>You agree to pay all charges associated with the services as described at the time of booking or as otherwise communicated.</li>
+        <li>You acknowledge that the Company is not responsible for any pre-existing damage, defects, or conditions on your property or to any structures, surfaces, fixtures, landscaping, or personal property.</li>
+        <li>To the fullest extent permitted by law, the Company’s liability for any claims arising from its services is limited to the amount you paid for those services.</li>
+        <li>You agree to indemnify and hold harmless the Company from any claims or liabilities arising from unsafe conditions on your property or failure to provide accurate information.</li>
+        <li>You understand that certain services may involve inherent risks and agree to assume those risks except in cases of the Company’s gross negligence or willful misconduct.</li>
+      </ul>
+      <p>By checking the box, you confirm that you have read, understood, and agree to these terms.</p>
+    </div>
+  </div>
+
+  <div class="confirmation-modal" id="confirmationModal">
+    <div class="confirmation-overlay" id="confirmationOverlay"></div>
+
+    <div class="confirmation-content">
+      <button type="button" class="close-confirmation" id="closeConfirmation">✕</button>
+      <h3>Car Wash Booked</h3>
+      <p>Your Sigma Wash car wash is booked.</p>
+      <div class="confirmation-message" id="confirmationMessage"></div>
+      <div class="confirmation-actions">
+        <button type="button" class="button" id="printConfirmation">Print</button>
+        <button type="button" class="secondary-button" id="downloadConfirmation">Download</button>
+        <button type="button" class="secondary-button" id="doneConfirmation">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const menuToggle = document.getElementById('menuToggle');
+
+    const form = document.getElementById('appointmentForm');
+    const statusMessage = document.getElementById('statusMessage');
+    const submitButton = document.getElementById('submitButton');
+    const hiddenSubmitFrame = document.querySelector('iframe[name="hiddenSubmitFrame"]');
+
+    const agreeTerms = document.getElementById('agreeTerms');
+    const openTerms = document.getElementById('openTerms');
+    const closeTerms = document.getElementById('closeTerms');
+    const termsModal = document.getElementById('termsModal');
+    const termsOverlay = document.getElementById('termsOverlay');
+
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const customerName = document.getElementById('customerName');
+    const phoneNumber = document.getElementById('phoneNumber');
+    const streetAddress = document.getElementById('streetAddress');
+    const city = document.getElementById('city');
+    const state = document.getElementById('state');
+    const zipCode = document.getElementById('zipCode');
+    const address = document.getElementById('address');
+    const appointmentTime = document.getElementById('appointmentTime');
+    const selectedAddOns = document.getElementById('selectedAddOns');
+    const confirmationNumberInput = document.getElementById('confirmationNumber');
+
+    const vehicleMake = document.getElementById('vehicleMake');
+    const vehicleModel = document.getElementById('vehicleModel');
+    const vehicleMakeSuggestions = document.getElementById('vehicleMakeSuggestions');
+    const vehicleModelSuggestions = document.getElementById('vehicleModelSuggestions');
+
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmationOverlay = document.getElementById('confirmationOverlay');
+    const closeConfirmation = document.getElementById('closeConfirmation');
+    const doneConfirmation = document.getElementById('doneConfirmation');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    const printConfirmation = document.getElementById('printConfirmation');
+    const downloadConfirmation = document.getElementById('downloadConfirmation');
+
+    const discountCodeInput = document.getElementById('discountCodeInput');
+    const applyDiscountButton = document.getElementById('applyDiscountButton');
+    const discountMessage = document.getElementById('discountMessage');
+    const enteredDiscountCodeInput = document.getElementById('enteredDiscountCode');
+    const discountCodeHidden = document.getElementById('discountCode');
+    const discountPercentageInput = document.getElementById('discountPercentage');
+    const originalPriceInput = document.getElementById('originalPrice');
+    const discountedPriceInput = document.getElementById('discountedPrice');
+    const priceSummary = document.getElementById('priceSummary');
+
+    const serviceCardExteriorPrice = document.getElementById('serviceCardExteriorPrice');
+    const serviceCardInteriorPrice = document.getElementById('serviceCardInteriorPrice');
+    const serviceCardTotalPrice = document.getElementById('serviceCardTotalPrice');
+    const radioExteriorPrice = document.getElementById('radioExteriorPrice');
+    const radioInteriorPrice = document.getElementById('radioInteriorPrice');
+    const radioTotalPrice = document.getElementById('radioTotalPrice');
+
+    const SERVICE_PRICES = {
+      'Exterior Only': 11.65,
+      'Interior Only': 26.30,
+      'Exterior / Interior': 37.95
+    };
+
+    const ADD_ON_PRICES = {
+      'Trunk ($2)': 2
+    };
+
+    let formSubmitted = false;
+    let pendingBookingDetails = null;
+    let latestConfirmationText = '';
+    let latestConfirmationNumber = '';
+    let discountCodes = [];
+    let discountCodesLoaded = false;
+    let discountCodesPromise = null;
+    let activeDiscount = null;
+    let discountCodeRequestCounter = 0;
+
+    const vehicleMakes = [
+      'Acura', 'Audi', 'BMW', 'Buick', 'Cadillac', 'Chevrolet', 'Chrysler', 'Dodge',
+      'Ford', 'GMC', 'Honda', 'Hyundai', 'Infiniti', 'Jeep', 'Kia', 'Lexus',
+      'Mazda', 'Mercedes-Benz', 'Nissan', 'Subaru', 'Tesla', 'Toyota', 'Volkswagen', 'Volvo'
+    ];
+
+    const modelsByMake = {
+      Acura: ['ILX', 'Integra', 'MDX', 'RDX', 'TLX'],
+      Audi: ['A3', 'A4', 'A5', 'Q3', 'Q5', 'Q7'],
+      BMW: ['2 Series', '3 Series', '4 Series', '5 Series', 'X3', 'X5'],
+      Buick: ['Encore', 'Encore GX', 'Enclave', 'Envista'],
+      Cadillac: ['CT4', 'CT5', 'Escalade', 'XT4', 'XT5'],
+      Chevrolet: ['Blazer', 'Camaro', 'Equinox', 'Malibu', 'Silverado', 'Tahoe', 'Traverse'],
+      Chrysler: ['300', 'Pacifica', 'Voyager'],
+      Dodge: ['Challenger', 'Charger', 'Durango', 'Hornet'],
+      Ford: ['Bronco', 'Escape', 'Expedition', 'Explorer', 'F-150', 'Focus', 'Fusion', 'Mustang'],
+      GMC: ['Acadia', 'Canyon', 'Sierra', 'Terrain', 'Yukon'],
+      Honda: ['Accord', 'Civic', 'CR-V', 'Fit', 'HR-V', 'Odyssey', 'Pilot'],
+      Hyundai: ['Elantra', 'Kona', 'Palisade', 'Santa Fe', 'Sonata', 'Tucson'],
+      Infiniti: ['Q50', 'QX50', 'QX60', 'QX80'],
+      Jeep: ['Cherokee', 'Compass', 'Gladiator', 'Grand Cherokee', 'Wrangler'],
+      Kia: ['Forte', 'K5', 'Seltos', 'Sorento', 'Soul', 'Sportage', 'Telluride'],
+      Lexus: ['ES', 'GX', 'IS', 'NX', 'RX', 'UX'],
+      Mazda: ['CX-30', 'CX-5', 'CX-9', 'Mazda3', 'Mazda6'],
+      'Mercedes-Benz': ['C-Class', 'CLA', 'E-Class', 'GLA', 'GLC', 'GLE'],
+      Nissan: ['Altima', 'Armada', 'Maxima', 'Murano', 'Rogue', 'Sentra'],
+      Subaru: ['Ascent', 'Crosstrek', 'Forester', 'Impreza', 'Legacy', 'Outback'],
+      Tesla: ['Model 3', 'Model S', 'Model X', 'Model Y'],
+      Toyota: ['4Runner', 'Camry', 'Corolla', 'Highlander', 'Prius', 'RAV4', 'Sienna', 'Tacoma', 'Tundra'],
+      Volkswagen: ['Atlas', 'Golf', 'Jetta', 'Passat', 'Taos', 'Tiguan'],
+      Volvo: ['S60', 'S90', 'XC40', 'XC60', 'XC90']
+    };
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+    }
+
+    function closeSidebarNow() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+
+    function showTerms() {
+      termsModal.classList.add('show');
+    }
+
+    function hideTerms() {
+      termsModal.classList.remove('show');
+    }
+
+    function showConfirmation() {
+      confirmationModal.classList.add('show');
+    }
+
+    function hideConfirmation() {
+      confirmationModal.classList.remove('show');
+    }
+
+    function updateSubmitState() {
+      submitButton.disabled = !agreeTerms.checked;
+    }
+
+    function normalizeValue(value) {
+      return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function normalizeDiscountCode(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function roundCurrency(value) {
+      return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+    }
+
+    function formatCurrency(value) {
+      return '$' + roundCurrency(value).toFixed(2);
+    }
+
+    function parseDiscountPercentage(value) {
+      if (value === null || value === undefined || value === '') return null;
+
+      if (typeof value === 'number') {
+        if (value > 0 && value <= 1) return roundCurrency(value * 100);
+        if (value > 1 && value <= 100) return roundCurrency(value);
+        return null;
+      }
+
+      const cleanedValue = String(value).trim().replace('%', '');
+      if (!cleanedValue) return null;
+
+      const parsedValue = Number(cleanedValue);
+      if (!Number.isFinite(parsedValue)) return null;
+
+      if (parsedValue > 0 && parsedValue <= 1) return roundCurrency(parsedValue * 100);
+      if (parsedValue > 1 && parsedValue <= 100) return roundCurrency(parsedValue);
+
+      return null;
+    }
+
+    function formatDiscountPercentage(value) {
+      return roundCurrency(value).toFixed(2).replace(/\.00$/, '') + '%';
+    }
+
+    function getSelectedServiceType() {
+      const selectedService = document.querySelector('input[name="serviceType"]:checked');
+      return selectedService ? selectedService.value : '';
+    }
+
+    function getSelectedAddOnValues() {
+      return Array.from(document.querySelectorAll('input[name="addOns"]:checked')).map(input => input.value);
+    }
+
+    function getAddOnsTotal(addOnValues) {
+      return roundCurrency(
+        addOnValues.reduce((total, addOn) => total + (ADD_ON_PRICES[addOn] || 0), 0)
+      );
+    }
+
+    function calculatePricing(serviceType) {
+      const baseServicePrice = SERVICE_PRICES[serviceType] || 0;
+      const addOnValues = getSelectedAddOnValues();
+      const addOnsTotal = getAddOnsTotal(addOnValues);
+      const discountPercentage = activeDiscount ? activeDiscount.percentage : 0;
+      const discountedServicePrice = roundCurrency(
+        baseServicePrice - (baseServicePrice * discountPercentage / 100)
+      );
+      const originalTotal = roundCurrency(baseServicePrice + addOnsTotal);
+      const discountedTotal = roundCurrency(discountedServicePrice + addOnsTotal);
+
+      return {
+        serviceType,
+        addOnValues,
+        addOnsTotal,
+        baseServicePrice,
+        discountPercentage,
+        discountedServicePrice,
+        originalTotal,
+        discountedTotal
+      };
+    }
+
+    function syncPriceFields() {
+      const pricing = calculatePricing(getSelectedServiceType());
+      enteredDiscountCodeInput.value = discountCodeInput.value.trim();
+      discountCodeHidden.value = activeDiscount ? activeDiscount.code : '';
+      discountPercentageInput.value = activeDiscount ? formatDiscountPercentage(activeDiscount.percentage) : '';
+      originalPriceInput.value = pricing.originalTotal ? pricing.originalTotal.toFixed(2) : '';
+      discountedPriceInput.value = pricing.discountedTotal ? pricing.discountedTotal.toFixed(2) : '';
+      return pricing;
+    }
+
+    function setDiscountMessage(message, color) {
+      discountMessage.textContent = message || '';
+      discountMessage.style.color = color || 'var(--muted)';
+    }
+
+    function updateDisplayedServicePrices() {
+      const factor = activeDiscount ? (1 - activeDiscount.percentage / 100) : 1;
+
+      const exteriorPrice = roundCurrency(SERVICE_PRICES['Exterior Only'] * factor);
+      const interiorPrice = roundCurrency(SERVICE_PRICES['Interior Only'] * factor);
+      const totalPrice = roundCurrency(SERVICE_PRICES['Exterior / Interior'] * factor);
+
+      serviceCardExteriorPrice.textContent = formatCurrency(exteriorPrice);
+      serviceCardInteriorPrice.textContent = formatCurrency(interiorPrice);
+      serviceCardTotalPrice.textContent = formatCurrency(totalPrice);
+
+      radioExteriorPrice.textContent = formatCurrency(exteriorPrice);
+      radioInteriorPrice.textContent = formatCurrency(interiorPrice);
+      radioTotalPrice.textContent = formatCurrency(totalPrice);
+    }
+
+    function updatePriceSummary() {
+      const serviceType = getSelectedServiceType();
+
+      if (!serviceType) {
+        priceSummary.textContent = '';
+        syncPriceFields();
+        return;
+      }
+
+      const pricing = syncPriceFields();
+
+      if (activeDiscount) {
+        priceSummary.textContent =
+          'Original total: ' + formatCurrency(pricing.originalTotal) +
+          ' · Discounted total: ' + formatCurrency(pricing.discountedTotal);
+      } else {
+        priceSummary.textContent = 'Current total: ' + formatCurrency(pricing.originalTotal);
+      }
+    }
+
+    async function loadDiscountCodes() {
+      if (discountCodesPromise) return discountCodesPromise;
+
+      discountCodesPromise = new Promise((resolve, reject) => {
+        const callbackName = 'sigmaWashDiscountCodesCallback_' + Date.now() + '_' + (++discountCodeRequestCounter);
+        const script = document.createElement('script');
+        let finished = false;
+        let timeoutId = null;
+
+        function cleanup() {
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+
+          if (window[callbackName]) {
+            delete window[callbackName];
+          }
+
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+        }
+
+        window[callbackName] = (result) => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          discountCodes = Array.isArray(result && result.codes) ? result.codes : [];
+          discountCodesLoaded = true;
+          resolve(discountCodes);
+        };
+
+        script.onerror = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          discountCodes = [];
+          discountCodesLoaded = false;
+          discountCodesPromise = null;
+          reject(new Error('Could not load discount codes from the deployed Apps Script web app.'));
+        };
+
+        const separator = form.action.includes('?') ? '&' : '?';
+        script.src =
+          form.action +
+          separator +
+          'action=getDiscountCodes&callback=' + encodeURIComponent(callbackName) +
+          '&ts=' + Date.now();
+
+        timeoutId = window.setTimeout(() => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          discountCodes = [];
+          discountCodesLoaded = false;
+          discountCodesPromise = null;
+          reject(new Error('Discount code request timed out.'));
+        }, 10000);
+
+        document.body.appendChild(script);
+      }).catch((error) => {
+        discountCodes = [];
+        discountCodesLoaded = false;
+        discountCodesPromise = null;
+        throw error;
+      });
+
+      return discountCodesPromise;
+    }
+
+    function findDiscountMatch(code) {
+      const normalizedInput = normalizeDiscountCode(code);
+      if (!normalizedInput) return null;
+
+      return discountCodes.find(discount => discount.normalizedCode === normalizedInput) || null;
+    }
+
+    async function applyDiscountCode(options = {}) {
+      const { notifyInvalid = true, silentIfEmpty = true } = options;
+      const enteredCode = discountCodeInput.value.trim();
+
+      enteredDiscountCodeInput.value = enteredCode;
+
+      if (!enteredCode) {
+        activeDiscount = null;
+        discountCodeHidden.value = '';
+        discountPercentageInput.value = '';
+        if (!silentIfEmpty) {
+          setDiscountMessage('', 'var(--muted)');
+        } else {
+          discountMessage.textContent = '';
+        }
+        updateDisplayedServicePrices();
+        updatePriceSummary();
+        return { isValid: true, match: null };
+      }
+
+      try {
+        if (!discountCodesLoaded) {
+          await loadDiscountCodes();
+        }
+      } catch (error) {
+        activeDiscount = null;
+        discountCodeHidden.value = '';
+        discountPercentageInput.value = '';
+        setDiscountMessage('Unable to verify the discount code right now. Prices are unchanged. Please make sure the Apps Script web app is redeployed.', '#d70015');
+        updateDisplayedServicePrices();
+        updatePriceSummary();
+        return { isValid: false, match: null, error };
+      }
+
+      const match = findDiscountMatch(enteredCode);
+
+      if (match) {
+        activeDiscount = {
+          code: match.code,
+          percentage: match.percentage
+        };
+        discountCodeInput.value = enteredCode;
+        discountCodeHidden.value = match.code;
+        discountPercentageInput.value = formatDiscountPercentage(match.percentage);
+        setDiscountMessage(
+          'Discount code applied. ' + formatDiscountPercentage(match.percentage) + ' off service prices.',
+          '#248a3d'
+        );
+        updateDisplayedServicePrices();
+        updatePriceSummary();
+        return { isValid: true, match };
+      }
+
+      activeDiscount = null;
+      discountCodeHidden.value = '';
+      discountPercentageInput.value = '';
+      if (notifyInvalid) {
+        setDiscountMessage('Invalid discount code. Prices remain unchanged.', '#d70015');
+      } else {
+        discountMessage.textContent = '';
+      }
+      updateDisplayedServicePrices();
+      updatePriceSummary();
+
+      return { isValid: false, match: null };
+    }
+
+    function updateCustomerName() {
+      customerName.value = [firstName.value.trim(), lastName.value.trim()].filter(Boolean).join(' ');
+    }
+
+    function updateFullAddress() {
+      address.value = [
+        streetAddress.value.trim(),
+        city.value.trim(),
+        state.value.trim().toUpperCase(),
+        zipCode.value.trim()
+      ].filter(Boolean).join(', ');
+    }
+
+    function validateFirstName() {
+      const isValid = firstName.value.trim().length > 0;
+      firstName.setCustomValidity(isValid ? '' : 'Please enter your first name.');
+      return isValid;
+    }
+
+    function validateLastName() {
+      const isValid = lastName.value.trim().length > 0;
+      lastName.setCustomValidity(isValid ? '' : 'Please enter your last name.');
+      return isValid;
+    }
+
+    function validatePhoneNumber() {
+      const digitsOnly = phoneNumber.value.replace(/\D/g, '');
+      const isValid = digitsOnly.length >= 10;
+      phoneNumber.setCustomValidity(isValid ? '' : 'Please enter a valid phone number.');
+      return isValid;
+    }
+
+    function validateStreetAddress() {
+      const isValid = streetAddress.value.trim().length >= 5;
+      streetAddress.setCustomValidity(isValid ? '' : 'Please enter your street address.');
+      return isValid;
+    }
+
+    function validateCity() {
+      const isValid = city.value.trim().length >= 2;
+      city.setCustomValidity(isValid ? '' : 'Please enter your city.');
+      return isValid;
+    }
+
+    function validateState() {
+      state.value = state.value.toUpperCase();
+      const isValid = /^[A-Z]{2}$/.test(state.value.trim());
+      state.setCustomValidity(isValid ? '' : 'Please enter a 2-letter state abbreviation.');
+      return isValid;
+    }
+
+    function validateZipCode() {
+      const isValid = /^\d{5}(-\d{4})?$/.test(zipCode.value.trim());
+      zipCode.setCustomValidity(isValid ? '' : 'Please enter a valid zip code.');
+      return isValid;
+    }
+
+    function validateTime() {
+      const value = appointmentTime.value;
+
+      if (!value) {
+        appointmentTime.setCustomValidity('');
+        return false;
+      }
+
+      const parts = value.split(':');
+      const minutes = Number(parts[1]);
+      const isValid = Number.isInteger(minutes) && minutes % 5 === 0;
+
+      appointmentTime.setCustomValidity(
+        isValid ? '' : 'Please choose a time in 5-minute increments only.'
+      );
+
+      return isValid;
+    }
+
+    function validateCustomFields() {
+      updateCustomerName();
+      updateFullAddress();
+
+      const firstNameValid = validateFirstName();
+      const lastNameValid = validateLastName();
+      const phoneValid = validatePhoneNumber();
+      const streetValid = validateStreetAddress();
+      const cityValid = validateCity();
+      const stateValid = validateState();
+      const zipValid = validateZipCode();
+      const timeValid = validateTime();
+
+      return firstNameValid && lastNameValid && phoneValid && streetValid && cityValid && stateValid && zipValid && timeValid;
+    }
+
+    function updateSelectedAddOns() {
+      const addOnValues = Array.from(document.querySelectorAll('input[name="addOns"]:checked')).map(input => input.value);
+      selectedAddOns.value = addOnValues.join(', ');
+    }
+
+    function generateConfirmationNumber() {
+      const randomPart = Math.random().toString(36).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+      return 'SIG-' + randomPart.padEnd(6, '0');
+    }
+
+    function formatBookingDate(value) {
+      if (!value) return '';
+      const date = new Date(value + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return value;
+
+      return date.toLocaleDateString(undefined, {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    function formatBookingTime(value) {
+      if (!value) return '';
+      const parts = value.split(':');
+      if (parts.length < 2) return value;
+
+      const date = new Date();
+      date.setHours(Number(parts[0]), Number(parts[1]), 0, 0);
+
+      return date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+    }
+
+    function populateDatalist(datalistElement, values) {
+      datalistElement.innerHTML = values.map(value => `<option value="${value}"></option>`).join('');
+    }
+
+    function updateMakeSuggestions() {
+      const query = vehicleMake.value.trim();
+
+      if (query.length < 2) {
+        vehicleMakeSuggestions.innerHTML = '';
+        return;
+      }
+
+      const filteredMakes = vehicleMakes.filter(make =>
+        make.toLowerCase().startsWith(query.toLowerCase())
+      );
+
+      populateDatalist(vehicleMakeSuggestions, filteredMakes.slice(0, 8));
+    }
+
+    function getMatchingMake() {
+      const normalizedMake = normalizeValue(vehicleMake.value.trim());
+      return vehicleMakes.find(make => normalizeValue(make) === normalizedMake);
+    }
+
+    function updateModelSuggestions() {
+      const query = vehicleModel.value.trim();
+
+      if (query.length < 2) {
+        vehicleModelSuggestions.innerHTML = '';
+        return;
+      }
+
+      const matchedMake = getMatchingMake();
+      const modelSource = matchedMake
+        ? (modelsByMake[matchedMake] || [])
+        : Object.values(modelsByMake).flat();
+
+      const filteredModels = modelSource.filter(model =>
+        model.toLowerCase().startsWith(query.toLowerCase())
+      );
+
+      populateDatalist(vehicleModelSuggestions, filteredModels.slice(0, 8));
+    }
+
+    function buildConfirmationText(details) {
+      return (
+        'Your car wash is booked.\n' +
+        'Confirmation Number: ' + details.confirmationNumber + '\n' +
+        'Customer: ' + details.customerName + '\n' +
+        'Phone: ' + details.phoneNumber + '\n' +
+        'Vehicle: ' + details.vehicleColor + ' ' + details.vehicleMake + ' ' + details.vehicleModel + '\n' +
+        'Service: ' + details.serviceType + '\n' +
+        'Add-ons: ' + details.addOns + '\n' +
+        'Discount Code: ' + details.discountCode + '\n' +
+        'Discount Percentage: ' + details.discountPercentage + '\n' +
+        'Original Price: ' + details.originalPrice + '\n' +
+        'Discounted Price: ' + details.discountedPrice + '\n' +
+        'Date: ' + formatBookingDate(details.appointmentDate) + '\n' +
+        'Time: ' + formatBookingTime(details.appointmentTime) + '\n' +
+        'Address: ' + details.address + '\n' +
+        'Payment: Collected after service is completed. Accepted methods: cash, Apple Pay, and Venmo.'
+      );
+    }
+
+    function printConfirmationMessage() {
+      if (!latestConfirmationText) return;
+
+      const printWindow = window.open('', '_blank', 'width=700,height=800');
+      if (!printWindow) return;
+
+      const escapedText = latestConfirmationText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Sigma Wash Confirmation</title>
+          <style>
+            body {
+              font-family: Arial, Helvetica, sans-serif;
+              padding: 32px;
+              color: #1d1d1f;
+              line-height: 1.7;
+            }
+            h1 {
+              margin-top: 0;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Sigma Wash Booking Confirmation</h1>
+          <div>${escapedText}</div>
+        </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+
+    function downloadConfirmationMessage() {
+      if (!latestConfirmationText || !latestConfirmationNumber) return;
+
+      const blob = new Blob([latestConfirmationText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      link.href = url;
+      link.download = `sigma-wash-confirmation-${latestConfirmationNumber}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+    }
+
+   function buildTimeOptions() {
+    const options = ['<option value="">Select a time</option>'];
+
+    const startMinutes = 8 * 60;   // 8:00 AM
+    const endMinutes = 20 * 60;    // 8:00 PM
+
+    for (let totalMinutes = startMinutes; totalMinutes <= endMinutes; totalMinutes += 5) {
+      const hour = Math.floor(totalMinutes / 60);
+      const minute = totalMinutes % 60;
+
+      const hourValue = String(hour).padStart(2, '0');
+      const minuteValue = String(minute).padStart(2, '0');
+      const value = `${hourValue}:${minuteValue}`;
+
+      const date = new Date();
+      date.setHours(hour, minute, 0, 0);
+
+      const label = date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit'
+      });
+
+      options.push(`<option value="${value}">${label}</option>`);
+    }
+
+    appointmentTime.innerHTML = options.join('');
+  }
+
+    menuToggle.addEventListener('click', () => {
+      if (sidebar.classList.contains('open')) {
+        closeSidebarNow();
+      } else {
+        openSidebar();
+      }
+    });
+
+    overlay.addEventListener('click', closeSidebarNow);
+
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 920) {
+          closeSidebarNow();
+        }
+      });
+    });
+
+    openTerms.addEventListener('click', showTerms);
+    closeTerms.addEventListener('click', hideTerms);
+    termsOverlay.addEventListener('click', hideTerms);
+    agreeTerms.addEventListener('change', updateSubmitState);
+
+    closeConfirmation.addEventListener('click', hideConfirmation);
+    doneConfirmation.addEventListener('click', hideConfirmation);
+    confirmationOverlay.addEventListener('click', hideConfirmation);
+    printConfirmation.addEventListener('click', printConfirmationMessage);
+    downloadConfirmation.addEventListener('click', downloadConfirmationMessage);
+
+    firstName.addEventListener('input', () => {
+      validateFirstName();
+      updateCustomerName();
+    });
+
+    lastName.addEventListener('input', () => {
+      validateLastName();
+      updateCustomerName();
+    });
+
+    phoneNumber.addEventListener('input', validatePhoneNumber);
+
+    streetAddress.addEventListener('input', () => {
+      validateStreetAddress();
+      updateFullAddress();
+    });
+
+    city.addEventListener('input', () => {
+      validateCity();
+      updateFullAddress();
+    });
+
+    state.addEventListener('input', () => {
+      validateState();
+      updateFullAddress();
+    });
+
+    zipCode.addEventListener('input', () => {
+      validateZipCode();
+      updateFullAddress();
+    });
+
+    appointmentTime.addEventListener('change', validateTime);
+
+    vehicleMake.addEventListener('input', () => {
+      updateMakeSuggestions();
+      updateModelSuggestions();
+    });
+
+    vehicleModel.addEventListener('input', updateModelSuggestions);
+
+    document.querySelectorAll('input[name="addOns"]').forEach(input => {
+      input.addEventListener('change', () => {
+        updateSelectedAddOns();
+        updatePriceSummary();
+      });
+    });
+
+    document.querySelectorAll('input[name="serviceType"]').forEach(input => {
+      input.addEventListener('change', updatePriceSummary);
+    });
+
+    discountCodeInput.addEventListener('input', () => {
+      const enteredCode = discountCodeInput.value.trim();
+      enteredDiscountCodeInput.value = enteredCode;
+
+      if (!enteredCode || !activeDiscount || normalizeDiscountCode(activeDiscount.code) !== normalizeDiscountCode(enteredCode)) {
+        activeDiscount = null;
+        discountCodeHidden.value = '';
+        discountPercentageInput.value = '';
+        discountMessage.textContent = '';
+        updateDisplayedServicePrices();
+        updatePriceSummary();
+      }
+    });
+
+    applyDiscountButton.addEventListener('click', async () => {
+      await applyDiscountCode();
+    });
+
+    discountCodeInput.addEventListener('keydown', async (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        await applyDiscountCode();
+      }
+    });
+
+    buildTimeOptions();
+    updateSubmitState();
+    updateSelectedAddOns();
+    updateCustomerName();
+    updateFullAddress();
+    updateDisplayedServicePrices();
+    updatePriceSummary();
+    loadDiscountCodes().catch(() => {
+      discountMessage.textContent = '';
+    });
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const selectedService = document.querySelector('input[name="serviceType"]:checked');
+
+      updateSelectedAddOns();
+      updateCustomerName();
+      updateFullAddress();
+
+      if (!validateCustomFields()) {
+        form.reportValidity();
+        statusMessage.textContent = '';
+        return;
+      }
+
+      if (!selectedService) {
+        statusMessage.textContent = 'Please choose a service.';
+        statusMessage.style.color = '#d70015';
+        return;
+      }
+
+      if (!agreeTerms.checked) {
+        statusMessage.textContent = 'Please agree to the Terms & Conditions.';
+        statusMessage.style.color = '#d70015';
+        showTerms();
+        return;
+      }
+
+      await applyDiscountCode();
+
+      const pricing = syncPriceFields();
+      const confirmationNumber = generateConfirmationNumber();
+      confirmationNumberInput.value = confirmationNumber;
+
+      pendingBookingDetails = {
+        confirmationNumber,
+        customerName: customerName.value.trim(),
+        phoneNumber: phoneNumber.value.trim(),
+        vehicleColor: document.getElementById('vehicleColor').value.trim(),
+        vehicleMake: vehicleMake.value.trim(),
+        vehicleModel: vehicleModel.value.trim(),
+        address: address.value.trim(),
+        appointmentDate: document.getElementById('appointmentDate').value,
+        appointmentTime: appointmentTime.value,
+        serviceType: selectedService.value,
+        addOns: selectedAddOns.value ? selectedAddOns.value : 'None',
+        discountCode: discountCodeHidden.value ? discountCodeHidden.value : 'None',
+        discountPercentage: discountPercentageInput.value ? discountPercentageInput.value : '0%',
+        originalPrice: formatCurrency(pricing.originalTotal),
+        discountedPrice: formatCurrency(pricing.discountedTotal)
+      };
+
+      formSubmitted = true;
+      statusMessage.textContent = 'Submitting...';
+      statusMessage.style.color = '#0071e3';
+      HTMLFormElement.prototype.submit.call(form);
+    });
+
+    hiddenSubmitFrame.addEventListener('load', function () {
+      if (!formSubmitted || !pendingBookingDetails) return;
+
+      latestConfirmationNumber = pendingBookingDetails.confirmationNumber;
+      latestConfirmationText = buildConfirmationText(pendingBookingDetails);
+      confirmationMessage.textContent = latestConfirmationText;
+
+      statusMessage.textContent = 'Car wash booked! Your confirmation number is ' + pendingBookingDetails.confirmationNumber + '.';
+      statusMessage.style.color = '#248a3d';
+
+      showConfirmation();
+
+      form.reset();
+      submitButton.disabled = true;
+      formSubmitted = false;
+      activeDiscount = null;
+      discountMessage.textContent = '';
+      enteredDiscountCodeInput.value = '';
+      discountCodeHidden.value = '';
+      discountPercentageInput.value = '';
+      originalPriceInput.value = '';
+      discountedPriceInput.value = '';
+      updateDisplayedServicePrices();
+      updateSelectedAddOns();
+      updateCustomerName();
+      updateFullAddress();
+      updatePriceSummary();
+      vehicleMakeSuggestions.innerHTML = '';
+      vehicleModelSuggestions.innerHTML = '';
+      pendingBookingDetails = null;
+    });
+  </script>
+</body>
+</html>
