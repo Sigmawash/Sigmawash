@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sigma Wash Reviews | Trusted by Local Drivers</title>
+  <meta
+    name="description"
+    content="Read customer reviews for Sigma Wash, see why drivers choose the service, and leave a review that stays pending approval until reviewed."
+  />
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --panel: #ffffff;
+      --panel-soft: #fbfbfd;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: #e5e5e7;
+      --blue: #0071e3;
+      --blue-hover: #0077ed;
+      --green: #248a3d;
+      --sidebar-width: 290px;
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      --max-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 16px;
+      top: -100px;
+      background: #fff;
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 14px;
+      z-index: 2000;
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--line);
+      padding: 28px 20px 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 10px 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #0071e3 0%, #46a3ff 100%);
+      box-shadow: 0 10px 24px rgba(0, 113, 227, 0.24);
+      flex-shrink: 0;
+    }
+
+    .brand-copy small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.01em;
+      margin-bottom: 6px;
+    }
+
+    .brand-copy h2 {
+      margin: 0;
+      font-size: 1.9rem;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .sidebar-copy {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.96rem;
+      padding: 0 10px;
+      margin-bottom: 22px;
+    }
+
+    .sidebar-group {
+      margin-bottom: 22px;
+    }
+
+    .sidebar-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .sidebar-nav a {
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 0.98rem;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a:focus-visible,
+    .sidebar-nav a.active {
+      background: #f0f3f6;
+      color: var(--blue);
+      transform: translateX(2px);
+      outline: none;
+    }
+
+    .sidebar-card {
+      margin-top: 26px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7f7fa 100%);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .sidebar-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.92rem;
+    }
+
+    .sidebar-card a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: rgba(245, 245, 247, 0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .topbar-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .menu-toggle {
+      display: none;
+      border: 0;
+      background: #fff;
+      border-radius: 999px;
+      width: 42px;
+      height: 42px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .brand {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 500;
+    }
+
+    .menu a:hover,
+    .menu a:focus-visible,
+    .menu a.active {
+      color: var(--text);
+      outline: none;
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 34px 28px 46px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      align-items: center;
+      gap: 28px;
+      padding: 34px 0 40px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .hero h1,
+    .section-intro,
+    .review-card h3,
+    .hero-panel h2 {
+      letter-spacing: -0.045em;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 0.96;
+      font-weight: 700;
+      max-width: 11ch;
+    }
+
+    .hero-copy p,
+    .hero-panel p,
+    .section-copy,
+    .review-card p,
+    .mini-card p,
+    .note {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .hero-copy p {
+      margin: 18px 0 0;
+      font-size: 1.08rem;
+      max-width: 44ch;
+    }
+
+    .hero-links,
+    .button-row,
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .button,
+    .button-secondary,
+    .text-link {
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .button,
+    button.button {
+      border: 0;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      padding: 13px 24px;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button:hover,
+    .button:focus-visible,
+    .button-secondary:hover,
+    .button-secondary:focus-visible,
+    .text-link:hover,
+    .text-link:focus-visible {
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      background: var(--blue-hover);
+    }
+
+    .button-secondary {
+      border: 1px solid #d7d7dc;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text);
+      padding: 12px 22px;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .button-secondary:hover,
+    .button-secondary:focus-visible {
+      border-color: #bfc6cf;
+      background: #fff;
+    }
+
+    .text-link {
+      color: var(--blue);
+      font-size: 1rem;
+    }
+
+    .hero-panel,
+    .glass-card,
+    .review-card,
+    .mini-card {
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel {
+      background: linear-gradient(180deg, #ffffff 0%, #f8f9fb 100%);
+      border: 1px solid var(--line);
+      padding: 28px;
+    }
+
+    .hero-panel h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      line-height: 1.05;
+    }
+
+    .hero-panel p {
+      margin: 0 0 16px;
+      font-size: 1rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.45rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .section {
+      margin-top: 36px;
+    }
+
+    .section-intro {
+      margin: 0 0 12px;
+      font-size: clamp(1.95rem, 4vw, 3.2rem);
+      line-height: 1.08;
+      font-weight: 700;
+    }
+
+    .section-intro .muted {
+      color: #6f7480;
+      font-weight: 600;
+    }
+
+    .section-copy {
+      margin: 0 0 24px;
+      max-width: 62ch;
+      font-size: 1.02rem;
+    }
+
+    .review-grid,
+    .why-grid,
+    .contact-grid,
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .review-card,
+    .mini-card {
+      background: linear-gradient(180deg, #ffffff 0%, #fafafd 100%);
+      border: 1px solid var(--line);
+      padding: 24px;
+    }
+
+    .review-card h3,
+    .mini-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+      line-height: 1.15;
+    }
+
+    .review-card p,
+    .mini-card p {
+      margin: 0;
+      font-size: 0.99rem;
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stars {
+      letter-spacing: 0.1em;
+      color: #ffb400;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .review-name {
+      color: var(--text);
+      font-size: 0.96rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .review-images {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .review-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      margin-bottom: 0;
+      display: block;
+      cursor: zoom-in;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .review-image:hover,
+    .review-image:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      outline: none;
+    }
+
+    .image-lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 3000;
+    }
+
+    .image-lightbox.open {
+      display: flex;
+    }
+
+    .image-lightbox-dialog {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-lightbox-image {
+      max-width: 96vw;
+      max-height: 92vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      background: #111;
+    }
+
+    .image-lightbox-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 48px;
+      height: 48px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .image-lightbox-close:hover,
+    .image-lightbox-close:focus-visible {
+      background: rgba(255, 255, 255, 0.24);
+      outline: none;
+    }
+
+    body.lightbox-open {
+      overflow: hidden;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      padding: 28px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      appearance: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: rgba(0, 113, 227, 0.55);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      transform: translateY(-1px);
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    .pending-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #f5f9ff;
+      border: 1px solid rgba(0, 113, 227, 0.16);
+      color: var(--blue);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .note {
+      margin: 14px 0 0;
+      font-size: 0.94rem;
+    }
+
+    .submission-status {
+      min-height: 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .contact-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .contact-link {
+      text-decoration: none;
+      color: var(--muted);
+    }
+
+    .footer-space {
+      height: 24px;
+    }
+
+    .overlay {
+      display: none;
+    }
+
+    .is-hidden {
+      display: none;
+    }
+
+    @media (max-width: 1180px) {
+      .hero,
+      .review-grid,
+      .why-grid,
+      .contact-grid,
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero {
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        display: none;
+      }
+
+      .overlay.show {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(29, 29, 31, 0.26);
+        z-index: 950;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page,
+      .topbar-inner {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .form-grid,
+      .review-grid,
+      .why-grid,
+      .contact-grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panel,
+      .glass-card,
+      .review-card,
+      .mini-card {
+        border-radius: 24px;
+      }
+
+      .actions,
+      .button-row,
+      .hero-links {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .button,
+      .button-secondary {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+
+      <div class="page">
+        <section class="hero" aria-labelledby="reviews-hero-title">
+          <div class="hero-copy">
+           
+
+           <a href="index.html">Go Back →</a>
+        </section>
+        
+
+        <section class="section" aria-labelledby="reviews-title">
+          <h2 class="section-intro" id="reviews-title">What customers are saying. <span class="muted">And why it matters.</span></h2>
+          <p class="section-copy">
+            Realistic, concise reviews make the service feel credible and approachable. Each one highlights something practical a new customer cares about before booking.
+          </p>
+
+          <div class="review-grid" id="reviewGrid">
+            <article class="review-card">
+              <div class="rating-row">
+                <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <div class="review-name">James R.</div>
+              </div>
+              <h3>Easy from start to finish</h3>
+              <p>Sigma Wash made it simple to schedule around work. My car looked noticeably better, and the whole process felt professional.</p>
+            </article>
+
+            <article class="review-card">
+              <div class="rating-row">
+                <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <div class="review-name">Ashley M.</div>
+              </div>
+              <h3>Great communication</h3>
+              <p>I appreciated the updates before arrival. It felt organized, and the final result made the inside of my car feel fresh again.</p>
+            </article>
+
+            <article class="review-card">
+              <div class="rating-row">
+                <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <div class="review-name">Daniel T.</div>
+              </div>
+              <h3>Worth booking again</h3>
+              <p>The convenience was the biggest thing for me. They came to my apartment lot, worked efficiently, and the finish looked clean and detailed.</p>
+            </article>
+
+            <article class="review-card">
+              <div class="rating-row">
+                <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <div class="review-name">Kayla B.</div>
+              </div>
+              <h3>Looked polished afterward</h3>
+              <p>My SUV had built up a lot of dust and clutter. Sigma Wash gave it a much more polished look without me needing to leave home.</p>
+            </article>
+
+            <article class="review-card">
+              <div class="rating-row">
+                <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <div class="review-name">Marcus L.</div>
+              </div>
+              <h3>Professional presentation</h3>
+              <p>Everything felt intentional—from booking to the final walk-through. That made me trust the service before they even started.</p>
+            </article>
+
+            <article class="review-card">
+              <div class="rating-row">
+                <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <div class="review-name">Olivia P.</div>
+              </div>
+              <h3>Convenient and reliable</h3>
+              <p>I booked because the site looked clean and trustworthy, and the service matched that impression. I’d confidently recommend Sigma Wash.</p>
+            </article>
+          </div>
+        </section>
+
+        
+
+        <section class="section glass-card" aria-labelledby="leave-review-title">
+        
+          <h2 class="section-intro" id="leave-review-title" style="margin-top: 16px;">Leave a Review</h2>
+          <p class="section-copy">
+            Reviews submitted here are held for approval before appearing on the site. This keeps the page curated, trustworthy, and free from automatic publishing.
+          </p>
+
+          <div id="reviewFormWrap" class="is-hidden">
+            <form id="reviewForm" class="form-grid" novalidate>
+              <div class="field">
+                <label for="reviewerName">Name</label>
+                <input id="reviewerName" name="reviewerName" type="text" placeholder="James R." required />
+              </div>
+
+              <div class="field">
+                <label for="reviewerRating">Star rating</label>
+                <select id="reviewerRating" name="reviewerRating" required>
+                  <option value="">Select a rating</option>
+                  <option value="5">5 stars</option>
+                  <option value="4">4 stars</option>
+                  <option value="3">3 stars</option>
+                  <option value="2">2 stars</option>
+                  <option value="1">1 star</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label for="reviewMessage">Your review</label>
+                <textarea id="reviewMessage" name="reviewMessage" placeholder="Tell future customers what stood out about your Sigma Wash experience." required></textarea>
+              </div>
+
+              <div class="field full">
+                <label for="reviewImage">Upload images (optional)</label>
+                <input
+                  id="reviewImage"
+                  name="reviewImage"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                />
+                <p class="note">Optional images. JPG, PNG, WEBP, or GIF. Maximum 4 images, 2 MB each.</p>
+                <div class="note" id="selectedImagesNote">No images selected.</div>
+              </div>
+
+              <div class="field full">
+                <div class="actions">
+                  <button class="button" type="submit">Submit for approval</button>
+                  <a class="text-link" href="index.html#booking">Book another wash →</a>
+                </div>
+                <p class="note">Submitted reviews stay pending approval and will not appear on this page automatically.</p>
+                <div class="submission-status" id="reviewStatus" aria-live="polite"></div>
+              </div>
+            </form>
+          </div>
+
+          <div class="button-row" id="reviewPlaceholderActions">
+            <button class="button-secondary" type="button" id="openReviewFormInline">Open review form</button>
+            
+          </div>
+        </section>
+
+        <section class="section glass-card" aria-labelledby="cta-title">
+          <h2 class="section-intro" id="cta-title">Ready to see the difference for yourself?</h2>
+          <p class="section-copy">The fastest next step is still the simplest one: book your wash and let Sigma Wash come to you.</p>
+          <div class="button-row">
+            <a class="button" href="index.html#booking">Go to booking</a>
+            <a class="button-secondary" href="index.html">Back to home</a>
+          </div>
+        </section>
+
+        <div class="footer-space" aria-hidden="true"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+    <div class="image-lightbox-dialog" role="dialog" aria-modal="true" aria-label="Expanded review image">
+      <button class="image-lightbox-close" id="imageLightboxClose" type="button" aria-label="Close image viewer">×</button>
+      <img class="image-lightbox-image" id="imageLightboxImage" alt="" />
+    </div>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyu0W1PYKS4LjDpsBFNKVi39he80l-Oy5bhDQu9bA9ZKSXZuNRH25gSJNTh5vAAIamksw/exec';
+    const MAX_REVIEW_IMAGES = 4;
+    const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const menuToggle = document.getElementById('menuToggle');
+    const leaveReviewButton = document.getElementById('leaveReviewButton');
+    const openReviewFormInline = document.getElementById('openReviewFormInline');
+    const reviewFormWrap = document.getElementById('reviewFormWrap');
+    const reviewPlaceholderActions = document.getElementById('reviewPlaceholderActions');
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewStatus = document.getElementById('reviewStatus');
+    const reviewGrid = document.getElementById('reviewGrid');
+    const reviewImageInput = document.getElementById('reviewImage');
+    const selectedImagesNote = document.getElementById('selectedImagesNote');
+    const imageLightbox = document.getElementById('imageLightbox');
+    const imageLightboxImage = document.getElementById('imageLightboxImage');
+    const imageLightboxClose = document.getElementById('imageLightboxClose');
+    let selectedReviewFiles = [];
+
+    function setReviewStatus(message, color) {
+      if (!reviewStatus) return;
+      reviewStatus.textContent = message;
+      reviewStatus.style.color = color || '#333';
+    }
+
+    function getFileKey(file) {
+      return [file.name, file.size, file.lastModified, file.type].join('::');
+    }
+
+    function renderSelectedImagesNote() {
+      if (!selectedImagesNote) return;
+
+      if (!selectedReviewFiles.length) {
+        selectedImagesNote.textContent = 'No images selected.';
+        return;
+      }
+
+      selectedImagesNote.textContent = selectedReviewFiles.length + ' image' + (selectedReviewFiles.length === 1 ? '' : 's') + ' selected: ' +
+        selectedReviewFiles.map(function(file) {
+          return file.name;
+        }).join(', ');
+    }
+
+    function clearSelectedFiles() {
+      selectedReviewFiles = [];
+      if (reviewImageInput) {
+        reviewImageInput.value = '';
+      }
+      renderSelectedImagesNote();
+    }
+
+    function addSelectedFiles(newFiles) {
+      const combined = selectedReviewFiles.slice();
+      const seen = new Set(combined.map(getFileKey));
+
+      newFiles.forEach(function(file) {
+        const key = getFileKey(file);
+        if (!seen.has(key)) {
+          combined.push(file);
+          seen.add(key);
+        }
+      });
+
+      return combined;
+    }
+
+    function openImageLightbox(src, alt) {
+      if (!imageLightbox || !imageLightboxImage || !src) return;
+      imageLightboxImage.src = src;
+      imageLightboxImage.alt = alt || 'Expanded review image';
+      imageLightbox.classList.add('open');
+      imageLightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
+    }
+
+    function closeImageLightbox() {
+      if (!imageLightbox || !imageLightboxImage) return;
+      imageLightbox.classList.remove('open');
+      imageLightbox.setAttribute('aria-hidden', 'true');
+      imageLightboxImage.src = '';
+      imageLightboxImage.alt = '';
+      document.body.classList.remove('lightbox-open');
+    }
+
+    function openSidebar() {
+      if (!sidebar || !overlay || !menuToggle) return;
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+      menuToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeSidebar() {
+      if (!sidebar || !overlay || !menuToggle) return;
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function showReviewForm() {
+      if (reviewFormWrap) reviewFormWrap.classList.remove('is-hidden');
+      if (reviewPlaceholderActions) reviewPlaceholderActions.classList.add('is-hidden');
+      if (reviewFormWrap) reviewFormWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function createStars(rating) {
+      const safeRating = Math.max(1, Math.min(5, Number(rating) || 5));
+      return '★'.repeat(safeRating) + '☆'.repeat(5 - safeRating);
+    }
+
+    function createReviewTitle(message, savedTitle) {
+      if (savedTitle && String(savedTitle).trim()) {
+        return String(savedTitle).trim();
+      }
+
+      const clean = String(message || '').replace(/\s+/g, ' ').trim();
+      if (!clean) return 'Great experience';
+
+      const firstSentence = clean.split(/[.!?]/)[0].trim();
+      if (!firstSentence) return 'Great experience';
+
+      return firstSentence.length > 38
+        ? firstSentence.slice(0, 35).trim() + '...'
+        : firstSentence;
+    }
+
+    function normalizeReviewImages(review) {
+      if (Array.isArray(review.imageUrls)) {
+        return review.imageUrls.filter(function(url) {
+          return typeof url === 'string' && url.trim();
+        });
+      }
+
+      if (review.imageUrl && String(review.imageUrl).trim()) {
+        return [String(review.imageUrl).trim()];
+      }
+
+      return [];
+    }
+
+    function createReviewImagesMarkup(imageUrls, reviewerName) {
+      if (!imageUrls.length) return '';
+
+      return `
+        <div class="review-images">
+          ${imageUrls.map((url, index) => `
+            <img
+              class="review-image"
+              src="${escapeHtml(url)}"
+              alt="Customer review image ${index + 1} from ${escapeHtml(reviewerName)}"
+              loading="lazy"
+              tabindex="0"
+            />
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderReviews(reviews) {
+      if (!reviewGrid || !Array.isArray(reviews) || reviews.length === 0) return;
+
+      reviewGrid.innerHTML = reviews.map((review) => {
+        const rating = Math.max(1, Math.min(5, Number(review.rating) || 5));
+        const rawName = review.name || 'Anonymous';
+        const name = escapeHtml(rawName);
+        const message = escapeHtml(review.review || '');
+        const title = escapeHtml(createReviewTitle(review.review, review.title));
+        const imageUrls = normalizeReviewImages(review);
+
+        return `
+          <article class="review-card">
+            ${createReviewImagesMarkup(imageUrls, rawName)}
+            <div class="rating-row">
+              <div class="stars" aria-label="${rating} out of 5 stars">${createStars(rating)}</div>
+              <div class="review-name">${name}</div>
+            </div>
+            <h3>${title}</h3>
+            <p>${message}</p>
+          </article>
+        `;
+      }).join('');
+    }
+
+    async function loadApprovedReviews() {
+      try {
+        const response = await fetch(`${APPS_SCRIPT_URL}?action=getApprovedReviews&_=${Date.now()}`, {
+          method: 'GET',
+          redirect: 'follow'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data && data.success && Array.isArray(data.reviews) && data.reviews.length > 0) {
+          renderReviews(data.reviews);
+        }
+      } catch (error) {
+        console.error('Could not load approved reviews:', error);
+      }
+    }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const result = String(reader.result || '');
+          const commaIndex = result.indexOf(',');
+          resolve({
+            imageName: file.name,
+            imageMimeType: file.type,
+            imageBase64: commaIndex !== -1 ? result.slice(commaIndex + 1) : result
+          });
+        };
+
+        reader.onerror = () => reject(new Error('Failed to read image file.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getSelectedFiles() {
+      return selectedReviewFiles.slice();
+    }
+
+    function validateSelectedFiles(files) {
+      if (files.length > MAX_REVIEW_IMAGES) {
+        return `You can upload a maximum of ${MAX_REVIEW_IMAGES} images.`;
+      }
+
+      for (const file of files) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+          return 'Only JPG, PNG, WEBP, and GIF images are allowed.';
+        }
+
+        if (file.size > MAX_IMAGE_BYTES) {
+          return 'Each image must be 2 MB or smaller.';
+        }
+      }
+
+      return '';
+    }
+
+    async function buildImagesPayload(files) {
+      if (!files.length) return [];
+      return Promise.all(files.map(function(file) {
+        return readFileAsBase64(file);
+      }));
+    }
+
+    async function submitReview(payload) {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return response.json();
+    }
+
+    if (menuToggle) {
+      menuToggle.addEventListener('click', () => {
+        if (sidebar && sidebar.classList.contains('open')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+    }
+
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+
+    document.querySelectorAll('.sidebar a').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 920) {
+          closeSidebar();
+        }
+      });
+    });
+
+    if (leaveReviewButton) leaveReviewButton.addEventListener('click', showReviewForm);
+    if (openReviewFormInline) openReviewFormInline.addEventListener('click', showReviewForm);
+
+    if (reviewGrid) {
+      reviewGrid.addEventListener('click', function(event) {
+        const image = event.target.closest('.review-image');
+        if (!image) return;
+        openImageLightbox(image.getAttribute('src'), image.getAttribute('alt'));
+      });
+
+      reviewGrid.addEventListener('keydown', function(event) {
+        const image = event.target.closest('.review-image');
+        if (!image) return;
+
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openImageLightbox(image.getAttribute('src'), image.getAttribute('alt'));
+        }
+      });
+    }
+
+    if (imageLightboxClose) {
+      imageLightboxClose.addEventListener('click', closeImageLightbox);
+    }
+
+    if (imageLightbox) {
+      imageLightbox.addEventListener('click', function(event) {
+        if (event.target === imageLightbox) {
+          closeImageLightbox();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && imageLightbox && imageLightbox.classList.contains('open')) {
+        closeImageLightbox();
+      }
+    });
+
+    if (reviewImageInput) {
+      reviewImageInput.addEventListener('change', () => {
+        const newFiles = reviewImageInput.files ? Array.from(reviewImageInput.files) : [];
+        const combinedFiles = addSelectedFiles(newFiles);
+        const validationMessage = validateSelectedFiles(combinedFiles);
+
+        if (validationMessage) {
+          reviewImageInput.value = '';
+          setReviewStatus(validationMessage, '#d70015');
+          return;
+        }
+
+        selectedReviewFiles = combinedFiles;
+        reviewImageInput.value = '';
+        renderSelectedImagesNote();
+
+        if (selectedReviewFiles.length > 0) {
+          setReviewStatus(`${selectedReviewFiles.length} image${selectedReviewFiles.length === 1 ? '' : 's'} selected.`, '#0071e3');
+        } else {
+          setReviewStatus('', '#333');
+        }
+      });
+    }
+
+    if (reviewForm) {
+      reviewForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (!reviewForm.checkValidity()) {
+          setReviewStatus('Please complete the form before submitting.', '#d70015');
+          reviewForm.reportValidity();
+          return;
+        }
+
+        const files = getSelectedFiles();
+        const validationMessage = validateSelectedFiles(files);
+
+        if (validationMessage) {
+          setReviewStatus(validationMessage, '#d70015');
+          return;
+        }
+
+        const payload = {
+          action: 'submitReview',
+          reviewerName: document.getElementById('reviewerName').value.trim(),
+          reviewerRating: document.getElementById('reviewerRating').value.trim(),
+          reviewMessage: document.getElementById('reviewMessage').value.trim(),
+          images: []
+        };
+
+        try {
+          if (files.length) {
+            payload.images = await buildImagesPayload(files);
+          }
+        } catch (error) {
+          setReviewStatus('Could not read one or more selected images.', '#d70015');
+          return;
+        }
+
+        try {
+          setReviewStatus('Submitting your review...', '#0071e3');
+
+          const result = await submitReview(payload);
+
+          if (result && result.success) {
+            reviewForm.reset();
+            clearSelectedFiles();
+            setReviewStatus('Thank you. Your review was received and is pending approval before publishing.', '#248a3d');
+          } else {
+            setReviewStatus((result && result.message) || 'Unable to submit your review right now.', '#d70015');
+          }
+        } catch (error) {
+          console.error('Review submission failed:', error);
+          setReviewStatus('Unable to submit your review right now.', '#d70015');
+        }
+      });
+    }
+
+    renderSelectedImagesNote();
+    loadApprovedReviews();
+  </script>
+</body>
+</html>
