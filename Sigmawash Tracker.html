@@ -4,79 +4,449 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SigmaWash Tracker</title>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { min-height: 100vh; background: #eef4ff; display: flex; justify-content: center; align-items: center; padding: 20px; }
-    .phone { width: 420px; max-width: 100%; background: white; border-radius: 28px; box-shadow: 0 20px 50px rgba(0,0,0,.18); overflow: hidden; }
-    .top { background: linear-gradient(135deg, #0f62fe, #0043ce); color: white; padding: 24px; }
-    .top-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .top h1 { font-size: 24px; margin-bottom: 8px; }
-    .top p { font-size: 14px; opacity: .92; line-height: 1.4; }
-    .badge { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3); padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: bold; }
-    .map { position: relative; height: 300px; background: #dbeafe; overflow: hidden; }
-    .grid-a, .grid-b { position: absolute; inset: 0; background-size: 44px 44px; opacity: .6; }
-    .grid-a { background-image: linear-gradient(90deg, white 1px, transparent 1px); }
-    .grid-b { background-image: linear-gradient(white 1px, transparent 1px); }
-    .road { position: absolute; height: 24px; background: #aebacc; border-radius: 999px; opacity: .95; }
-    .road.one { width: 470px; top: 146px; left: -42px; transform: rotate(-17deg); }
-    .road.two { width: 300px; top: 91px; right: -58px; transform: rotate(56deg); }
-    .road.three { width: 310px; top: 228px; left: -52px; transform: rotate(36deg); }
-    .route { position: absolute; left: 64px; top: 84px; width: 265px; height: 150px; border-top: 6px dashed #0f62fe; border-right: 6px dashed #0f62fe; border-radius: 0 90px 0 0; opacity: .9; }
-    .marker, .wash, .van { position: absolute; width: 52px; height: 52px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 25px; z-index: 5; box-shadow: 0 8px 20px rgba(0,0,0,.22); }
-    .marker { background: white; }
-    .shop { left: 42px; top: 65px; }
-    .home { right: 40px; bottom: 48px; }
-    .wash { right: 92px; bottom: 98px; background: white; display: none; animation: float 1.2s ease-in-out infinite alternate; }
-    .van { left: 42px; top: 65px; background: #111827; color: white; transition: left .8s linear, top .8s linear; z-index: 8; }
-    .pulse { position: absolute; width: 78px; height: 78px; border-radius: 50%; background: rgba(15,98,254,.22); left: -13px; top: -13px; animation: pulse 1.5s infinite; z-index: -1; }
-    @keyframes pulse { from { transform: scale(.8); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
-    @keyframes float { from { transform: translateY(0); } to { transform: translateY(-6px); } }
-    .card { padding: 22px; }
-    .lookup { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 20px; padding: 16px; margin-bottom: 18px; }
-    label { display: block; color: #374151; font-size: 13px; font-weight: bold; margin-bottom: 8px; }
-    .lookup-row { display: flex; gap: 10px; }
-    input { flex: 1; min-width: 0; border: 1px solid #d1d5db; border-radius: 14px; padding: 13px 14px; font-size: 15px; outline: none; text-transform: uppercase; }
-    input:focus { border-color: #0f62fe; box-shadow: 0 0 0 3px rgba(15,98,254,.12); }
-    button { border: none; padding: 14px; border-radius: 16px; font-size: 15px; cursor: pointer; font-weight: bold; white-space: nowrap; }
-    .primary { background: #0f62fe; color: white; }
-    .secondary { flex: 1; background: #e5e7eb; color: #111827; }
-    .ghost { flex: 1; background: #eef4ff; color: #0f62fe; }
-    .note { color: #6b7280; font-size: 12px; line-height: 1.4; margin-top: 10px; }
-    .message { display: none; padding: 14px; margin-bottom: 16px; border-radius: 14px; font-size: 14px; line-height: 1.4; }
-    .error { background: #fee2e2; color: #991b1b; }
-    .success { background: #dcfce7; color: #166534; }
-    .status { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
-    .status h2 { font-size: 20px; color: #111827; margin-bottom: 6px; }
-    .status p { color: #6b7280; font-size: 14px; line-height: 1.4; }
-    .eta { min-width: 94px; text-align: center; background: #f3f4f6; border-radius: 18px; padding: 12px; }
-    .eta strong { display: block; font-size: 22px; color: #111827; }
-    .eta span { font-size: 12px; color: #6b7280; }
-    .progress-wrap { width: 100%; height: 10px; background: #e5e7eb; border-radius: 999px; overflow: hidden; margin-bottom: 16px; }
-    .progress { height: 100%; width: 0%; background: #0f62fe; border-radius: 999px; transition: width .4s ease; }
-    .details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .box { background: #f9fafb; border-radius: 16px; padding: 14px; }
-    .box span { color: #6b7280; font-size: 12px; }
-    .box strong { display: block; color: #111827; font-size: 15px; margin-top: 4px; word-break: break-word; }
-    .steps { list-style: none; margin-bottom: 20px; }
-    .steps li { display: flex; gap: 10px; color: #9ca3af; font-size: 14px; padding: 8px 0; }
-    .steps li.active { color: #111827; font-weight: bold; }
-    .steps li.done { color: #16a34a; }
-    .dot { width: 14px; height: 14px; border-radius: 50%; background: currentColor; margin-top: 2px; flex-shrink: 0; }
-    .controls { display: flex; gap: 10px; }
-    @media (max-width: 440px) { body { padding: 0; align-items: stretch; } .phone { width: 100%; min-height: 100vh; border-radius: 0; } .map { height: 280px; } }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #eef4ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .phone {
+      width: 420px;
+      max-width: 100%;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.18);
+      overflow: hidden;
+    }
+
+    .top {
+      background: linear-gradient(135deg, #0f62fe, #0043ce);
+      color: white;
+      padding: 24px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .top p {
+      font-size: 14px;
+      opacity: .92;
+      line-height: 1.4;
+    }
+
+    .badge {
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .map {
+      position: relative;
+      height: 300px;
+      background: #dbeafe;
+      overflow: hidden;
+    }
+
+    .grid-a,
+    .grid-b {
+      position: absolute;
+      inset: 0;
+      background-size: 44px 44px;
+      opacity: .6;
+    }
+
+    .grid-a {
+      background-image: linear-gradient(90deg, white 1px, transparent 1px);
+    }
+
+    .grid-b {
+      background-image: linear-gradient(white 1px, transparent 1px);
+    }
+
+    .road {
+      position: absolute;
+      height: 24px;
+      background: #aebacc;
+      border-radius: 999px;
+      opacity: .95;
+    }
+
+    .road.one {
+      width: 470px;
+      top: 146px;
+      left: -42px;
+      transform: rotate(-17deg);
+    }
+
+    .road.two {
+      width: 300px;
+      top: 91px;
+      right: -58px;
+      transform: rotate(56deg);
+    }
+
+    .road.three {
+      width: 310px;
+      top: 228px;
+      left: -52px;
+      transform: rotate(36deg);
+    }
+
+    .route {
+      position: absolute;
+      left: 64px;
+      top: 84px;
+      width: 265px;
+      height: 150px;
+      border-top: 6px dashed #0f62fe;
+      border-right: 6px dashed #0f62fe;
+      border-radius: 0 90px 0 0;
+      opacity: .9;
+    }
+
+    .marker,
+    .wash,
+    .van {
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 25px;
+      z-index: 5;
+      box-shadow: 0 8px 20px rgba(0,0,0,.22);
+    }
+
+    .marker {
+      background: white;
+    }
+
+    .shop {
+      left: 42px;
+      top: 65px;
+    }
+
+    .home {
+      right: 40px;
+      bottom: 48px;
+    }
+
+    .wash {
+      right: 92px;
+      bottom: 98px;
+      background: white;
+      display: none;
+      animation: float 1.2s ease-in-out infinite alternate;
+    }
+
+    .van {
+      left: 42px;
+      top: 65px;
+      background: #111827;
+      color: white;
+      transition: left .8s linear, top .8s linear;
+      z-index: 8;
+    }
+
+    .pulse {
+      position: absolute;
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      background: rgba(15,98,254,.22);
+      left: -13px;
+      top: -13px;
+      animation: pulse 1.5s infinite;
+      z-index: -1;
+    }
+
+    @keyframes pulse {
+      from {
+        transform: scale(.8);
+        opacity: 1;
+      }
+
+      to {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    @keyframes float {
+      from {
+        transform: translateY(0);
+      }
+
+      to {
+        transform: translateY(-6px);
+      }
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .lookup {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      color: #374151;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .lookup-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 15px;
+      outline: none;
+      text-transform: uppercase;
+    }
+
+    input:focus {
+      border-color: #0f62fe;
+      box-shadow: 0 0 0 3px rgba(15,98,254,.12);
+    }
+
+    button {
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .primary {
+      background: #0f62fe;
+      color: white;
+    }
+
+    .secondary {
+      flex: 1;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .ghost {
+      flex: 1;
+      background: #eef4ff;
+      color: #0f62fe;
+    }
+
+    .note {
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-top: 10px;
+    }
+
+    .message {
+      display: none;
+      padding: 14px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .status h2 {
+      font-size: 20px;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .status p {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .eta {
+      min-width: 94px;
+      text-align: center;
+      background: #f3f4f6;
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .eta strong {
+      display: block;
+      font-size: 22px;
+      color: #111827;
+    }
+
+    .eta span {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #0f62fe;
+      border-radius: 999px;
+      transition: width .4s ease;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      background: #f9fafb;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .box span {
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+    .box strong {
+      display: block;
+      color: #111827;
+      font-size: 15px;
+      margin-top: 4px;
+      word-break: break-word;
+    }
+
+    .steps {
+      list-style: none;
+      margin-bottom: 20px;
+    }
+
+    .steps li {
+      display: flex;
+      gap: 10px;
+      color: #9ca3af;
+      font-size: 14px;
+      padding: 8px 0;
+    }
+
+    .steps li.active {
+      color: #111827;
+      font-weight: bold;
+    }
+
+    .steps li.done {
+      color: #16a34a;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: currentColor;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    @media (max-width: 440px) {
+      body {
+        padding: 0;
+        align-items: stretch;
+      }
+
+      .phone {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+      }
+
+      .map {
+        height: 280px;
+      }
+    }
   </style>
 </head>
- <div class="page">
-        <section class="hero">
-          <div class="hero-copy">
-           
-            <div class="hero-links">
-              <a href="index.html">Go Back →</a>
-              <br>
-            </div>
-          </div>
-      <section class="glass-card" id="contact">
-      <br>
 
 <body>
   <main class="phone">
@@ -85,7 +455,9 @@
         <div>
           <h1>SigmaWash Tracker</h1>
           <p>Enter your confirmation number to see your mobile car wash progress.</p>
+          <a class="back-link" href="index.html">Go Back →</a>
         </div>
+
         <div class="badge">SIGMA</div>
       </div>
     </section>
@@ -106,10 +478,12 @@
     <section class="card">
       <div class="lookup">
         <label for="confirmationInput">Confirmation Number</label>
+
         <div class="lookup-row">
           <input id="confirmationInput" placeholder="Example: SW12345" autocomplete="off" />
           <button class="primary" id="lookupButton" onclick="lookupAppointment()">Track</button>
         </div>
+
         <p class="note">Only the confirmation number is used to find your appointment.</p>
       </div>
 
@@ -121,17 +495,27 @@
           <h2 id="statusTitle">Enter confirmation number</h2>
           <p id="statusMessage">Your wash progress will appear here after we find your appointment.</p>
         </div>
+
         <div class="eta">
           <strong id="eta">--</strong>
           <span id="etaLabel">min left</span>
         </div>
       </div>
 
-      <div class="progress-wrap"><div class="progress" id="progressBar"></div></div>
+      <div class="progress-wrap">
+        <div class="progress" id="progressBar"></div>
+      </div>
 
       <div class="details">
-        <div class="box"><span>Appointment</span><strong id="appointmentTime">--</strong></div>
-        <div class="box"><span>Current step</span><strong id="currentStep">--</strong></div>
+        <div class="box">
+          <span>Appointment</span>
+          <strong id="appointmentTime">--</strong>
+        </div>
+
+        <div class="box">
+          <span>Current step</span>
+          <strong id="currentStep">--</strong>
+        </div>
       </div>
 
       <ul class="steps">
@@ -149,7 +533,8 @@
   </main>
 
   <script>
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxSF7rmDFNgU6UWoqw48eEgiVrTW2ry7yA0WPP_MtFukEJC71jUz-ZJzdQc_haDvbaGMg/exec";
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwQHBgknDwc4YZPEswDCxp_YhZx0RJmniCN6-gBF_T4IRMqkmquVsOSyzECYtwpuRec6w/exec";
+
     const DEFAULT_DRIVING_MINUTES = 20;
     const DEFAULT_ARRIVAL_MINUTES = 5;
     const DEFAULT_WASHING_MINUTES = 30;
@@ -181,8 +566,6 @@
     ];
 
     const vanRoute = [
-      // These points keep the CENTER of the car on the dotted route line.
-      // The car is 52px wide, so each left/top value is route center minus 26px.
       { left: 38, top: 61 },
       { left: 95, top: 61 },
       { left: 155, top: 61 },
@@ -199,6 +582,7 @@
 
     async function lookupAppointment() {
       const confirmation = confirmationInput.value.trim().toUpperCase();
+
       if (!confirmation) {
         showError("Please enter your confirmation number.");
         return;
@@ -237,6 +621,7 @@
         showError("Enter your confirmation number first.");
         return;
       }
+
       confirmationInput.value = selectedConfirmation;
       await lookupAppointment();
     }
@@ -275,11 +660,28 @@
 
         function cleanup() {
           clearTimeout(timer);
-          if (script.parentNode) script.parentNode.removeChild(script);
-          try { delete window[callbackName]; } catch (error) { window[callbackName] = undefined; }
+
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+
+          try {
+            delete window[callbackName];
+          } catch (error) {
+            window[callbackName] = undefined;
+          }
         }
 
-        script.src = SHEET_API_URL + separator + "callback=" + encodeURIComponent(callbackName) + "&confirmation=" + encodeURIComponent(confirmation) + "&t=" + Date.now();
+        script.src =
+          SHEET_API_URL +
+          separator +
+          "callback=" +
+          encodeURIComponent(callbackName) +
+          "&confirmation=" +
+          encodeURIComponent(confirmation) +
+          "&t=" +
+          Date.now();
+
         document.body.appendChild(script);
       });
     }
@@ -291,21 +693,36 @@
       if (data.row) return data.row;
 
       const rows = normalizeRows(data);
+
       return rows.find(function(row) {
-        const rowConfirmation = getValue(row, ["Confirmation Number", "Confirmation", "Confirm Number", "Order Number"]);
+        const rowConfirmation = getValue(row, [
+          "Confirmation Number",
+          "Confirmation",
+          "Confirm Number",
+          "Order Number"
+        ]);
+
         return normalizeText(rowConfirmation) === normalizeText(confirmation);
       }) || null;
     }
 
     function normalizeRows(data) {
       const raw = Array.isArray(data) ? data : (data.data || data.rows || data.values || []);
+
       if (!Array.isArray(raw) || raw.length === 0) return [];
 
       if (Array.isArray(raw[0])) {
-        const headers = raw[0].map(function(header) { return String(header || "").trim(); });
+        const headers = raw[0].map(function(header) {
+          return String(header || "").trim();
+        });
+
         return raw.slice(1).map(function(row) {
           const object = {};
-          headers.forEach(function(header, index) { object[header] = row[index]; });
+
+          headers.forEach(function(header, index) {
+            object[header] = row[index];
+          });
+
           return object;
         });
       }
@@ -316,13 +733,18 @@
     function startLiveTracking() {
       stopTimers();
       updateFromSelectedRow();
+
       countdownTimer = setInterval(updateFromSelectedRow, 1000);
 
       refreshTimer = setInterval(async function() {
         if (!selectedConfirmation) return;
+
         try {
           const match = await getAppointmentByConfirmation(selectedConfirmation);
-          if (match) selectedRow = match;
+
+          if (match) {
+            selectedRow = match;
+          }
         } catch (error) {
           console.warn("Auto refresh failed", error);
         }
@@ -331,6 +753,7 @@
 
     function updateFromSelectedRow() {
       if (!selectedRow) return;
+
       const timeline = buildTimeline(selectedRow);
       const now = new Date();
       const status = getStatusFromTimeline(timeline, now);
@@ -340,11 +763,17 @@
       eta.textContent = status.minutesLeft;
       etaLabel.textContent = status.etaLabel;
       currentStep.textContent = status.stepName;
-      const timestampDate = parseDateValue(getValue(selectedRow, ["Timestamp", "Form Timestamp", "Submitted Timestamp"]));
-      appointmentTime.textContent = timestampDate
-        ? formatDateTime(timestampDate)
-        : "Not listed";
+
+      /*
+        FIXED:
+        This displays Appointment Date + Appointment Time from Google Sheets.
+        It does NOT display the form Timestamp.
+        It also avoids the one-day timezone shift.
+      */
+      appointmentTime.textContent = formatAppointmentDisplay(selectedRow);
+
       progressBar.style.width = status.progressPercent + "%";
+
       moveVan(status.mapProgress, status.stageIndex);
       updateSteps(status.stageIndex);
     }
@@ -352,10 +781,6 @@
     function buildTimeline(row) {
       const appointmentStart = parseAppointmentDateTime(row);
 
-      // IMPORTANT:
-      // Timestamp2 is the time SigmaWash starts driving.
-      // Driving is a number like "30", meaning 30 minutes after Timestamp2.
-      // The regular form Timestamp is NOT used for tracking progress.
       const timestamp2 = parseDateValue(getValue(row, [
         "Timestamp2",
         "Timestamp 2",
@@ -408,20 +833,21 @@
       const finishedTimestamp = parseDateValue(finishedRaw);
 
       const hasDrivingValue = String(drivingRaw || "").trim() !== "";
+
       const drivingMinutes = hasDrivingValue
         ? parseDurationMinutes(drivingRaw, DEFAULT_DRIVING_MINUTES)
         : null;
+
       const arriveMinutes = arriveTimestamp
         ? DEFAULT_ARRIVAL_MINUTES
         : parseDurationMinutes(arriveRaw, DEFAULT_ARRIVAL_MINUTES);
+
       const washingMinutes = washingTimestamp
         ? DEFAULT_WASHING_MINUTES
         : parseDurationMinutes(washingRaw, DEFAULT_WASHING_MINUTES);
 
       let drivingStart = timestamp2;
 
-      // If Timestamp2 is missing, fall back to appointment time minus driving minutes.
-      // This is only a fallback so the tracker still works.
       if (!drivingStart && appointmentStart && hasDrivingValue) {
         drivingStart = addMinutes(appointmentStart, -drivingMinutes);
       }
@@ -430,22 +856,23 @@
         drivingStart = appointmentStart || new Date();
       }
 
-      // Main rule:
-      // If Timestamp2 = 1:00 PM and Driving = 30,
-      // arrival time = 1:30 PM.
-      let arriveStart = arriveTimestamp || (hasDrivingValue ? addMinutes(drivingStart, drivingMinutes) : drivingStart);
+      const arriveStart = arriveTimestamp || (
+        hasDrivingValue
+          ? addMinutes(drivingStart, drivingMinutes)
+          : drivingStart
+      );
 
       const washingStart = washingTimestamp || addMinutes(arriveStart, arriveMinutes);
       const finishedTime = finishedTimestamp || addMinutes(washingStart, washingMinutes);
 
       return {
-        appointmentStart,
-        timestamp2,
-        hasDrivingValue,
-        drivingStart,
-        arriveStart,
-        washingStart,
-        finishedTime
+        appointmentStart: appointmentStart,
+        timestamp2: timestamp2,
+        hasDrivingValue: hasDrivingValue,
+        drivingStart: drivingStart,
+        arriveStart: arriveStart,
+        washingStart: washingStart,
+        finishedTime: finishedTime
       };
     }
 
@@ -454,8 +881,6 @@
       const timestamp2 = timeline.timestamp2;
       const drivingStart = timeline.drivingStart;
 
-      // If Timestamp2 is blank, live tracking has not started.
-      // Do not show Finished, arrival time, or countdown time.
       if (!timestamp2) {
         return {
           title: "We're excited to work with you",
@@ -468,13 +893,11 @@
           mapProgress: 0
         };
       }
+
       const arriveStart = timeline.arriveStart;
       const washingStart = timeline.washingStart;
       const finishedTime = timeline.finishedTime;
 
-      // Rule 1:
-      // If Timestamp2 is on a calendar date before the Appointment Date,
-      // show Finished. This prevents old tracking dates from showing a live drive.
       if (timestamp2 && appointmentStart && isBeforeCalendarDate(timestamp2, appointmentStart)) {
         return {
           title: "Finished",
@@ -488,9 +911,6 @@
         };
       }
 
-      // Rule 2:
-      // If the appointment is within the next 6 hours, but tracking has not started,
-      // show a friendly pre-appointment message.
       if (appointmentStart && now < appointmentStart && now >= addMinutes(appointmentStart, -360)) {
         return {
           title: "We're excited to work with you",
@@ -503,7 +923,9 @@
           mapProgress: 0
         };
       }
+
       const totalMs = Math.max(1, finishedTime - drivingStart);
+
       let progress = clamp((now - drivingStart) / totalMs, 0, 1);
       let title = "Scheduled";
       let message = "Your SigmaWash appointment is scheduled.";
@@ -563,10 +985,66 @@
       };
     }
 
+    function formatAppointmentDisplay(row) {
+      const dateValue = getValue(row, [
+        "Appointment Date",
+        "Date",
+        "Appt Date",
+        "Service Date"
+      ]);
+
+      const timeValue = getValue(row, [
+        "Appointment Time",
+        "Time",
+        "Appt Time",
+        "Service Time"
+      ]);
+
+      const dateOnly = parseDateOnlyValue(dateValue);
+      const timeOnly = parseTimeParts(timeValue);
+
+      const dateText = dateOnly
+        ? dateOnly.toLocaleDateString([], {
+            month: "short",
+            day: "numeric"
+          })
+        : String(dateValue || "").trim();
+
+      const timeText = timeOnly
+        ? formatTimeParts(timeOnly)
+        : String(timeValue || "").trim();
+
+      if (dateText && timeText) {
+        return dateText + ", " + timeText;
+      }
+
+      if (dateText) {
+        return dateText;
+      }
+
+      if (timeText) {
+        return timeText;
+      }
+
+      return "Not listed";
+    }
+
     function parseAppointmentDateTime(row) {
-      const dateValue = getValue(row, ["Appointment Date", "Date", "Appt Date", "Service Date"]);
-      const timeValue = getValue(row, ["Appointment Time", "Time", "Appt Time", "Service Time"]);
-      const dateOnly = parseDateValue(dateValue);
+      const dateValue = getValue(row, [
+        "Appointment Date",
+        "Date",
+        "Appt Date",
+        "Service Date"
+      ]);
+
+      const timeValue = getValue(row, [
+        "Appointment Time",
+        "Time",
+        "Appt Time",
+        "Service Time"
+      ]);
+
+      const dateOnly = parseDateOnlyValue(dateValue);
       const timeOnly = parseTimeParts(timeValue);
 
       if (dateOnly && timeOnly) {
@@ -574,13 +1052,124 @@
         return dateOnly;
       }
 
-      if (dateOnly) return dateOnly;
-      return parseDateValue(String(dateValue || "") + " " + String(timeValue || ""));
+      if (dateOnly) {
+        return dateOnly;
+      }
+
+      return null;
+    }
+
+    function parseDateOnlyValue(value) {
+      if (value === null || value === undefined || value === "") return null;
+
+      if (value instanceof Date && !isNaN(value)) {
+        return new Date(
+          value.getFullYear(),
+          value.getMonth(),
+          value.getDate()
+        );
+      }
+
+      if (typeof value === "number") {
+        if (value > 10000) {
+          const wholeDays = Math.floor(value);
+          const utcDate = new Date(Math.round((wholeDays - 25569) * 86400 * 1000));
+
+          return new Date(
+            utcDate.getUTCFullYear(),
+            utcDate.getUTCMonth(),
+            utcDate.getUTCDate()
+          );
+        }
+
+        return null;
+      }
+
+      const text = String(value).trim();
+
+      if (!text) return null;
+
+      // Handles "2026-04-28" or "2026-04-28T00:00:00.000Z"
+      const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+      if (isoMatch) {
+        return new Date(
+          Number(isoMatch[1]),
+          Number(isoMatch[2]) - 1,
+          Number(isoMatch[3])
+        );
+      }
+
+      // Handles "4/28/2026", "04/28/2026", "4/28/26",
+      // and also "4/28/2026 12:00:00 AM"
+      const slashMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:\s+.*)?$/);
+
+      if (slashMatch) {
+        let year = Number(slashMatch[3]);
+
+        if (year < 100) {
+          year += 2000;
+        }
+
+        return new Date(
+          year,
+          Number(slashMatch[1]) - 1,
+          Number(slashMatch[2])
+        );
+      }
+
+      // Handles "Apr 28, 2026" or "April 28, 2026"
+      const monthTextMatch = text.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+
+      if (monthTextMatch) {
+        const months = {
+          jan: 0,
+          january: 0,
+          feb: 1,
+          february: 1,
+          mar: 2,
+          march: 2,
+          apr: 3,
+          april: 3,
+          may: 4,
+          jun: 5,
+          june: 5,
+          jul: 6,
+          july: 6,
+          aug: 7,
+          august: 7,
+          sep: 8,
+          sept: 8,
+          september: 8,
+          oct: 9,
+          october: 9,
+          nov: 10,
+          november: 10,
+          dec: 11,
+          december: 11
+        };
+
+        const monthName = monthTextMatch[1].toLowerCase();
+        const monthIndex = months[monthName];
+
+        if (monthIndex !== undefined) {
+          return new Date(
+            Number(monthTextMatch[3]),
+            monthIndex,
+            Number(monthTextMatch[2])
+          );
+        }
+      }
+
+      return null;
     }
 
     function parseDateValue(value) {
       if (value === null || value === undefined || value === "") return null;
-      if (value instanceof Date && !isNaN(value)) return value;
+
+      if (value instanceof Date && !isNaN(value)) {
+        return value;
+      }
 
       if (typeof value === "number") {
         if (value > 10000) {
@@ -590,132 +1179,238 @@
           date.setSeconds(date.getSeconds() + Math.round(86400 * fraction));
           return date;
         }
+
         return null;
       }
 
       const text = String(value).trim();
+
       if (!text) return null;
       if (isSimpleNumber(text)) return null;
       if (looksLikeOnlyTime(text)) return null;
 
       const parsed = new Date(text);
-      if (!isNaN(parsed)) return parsed;
+
+      if (!isNaN(parsed)) {
+        return parsed;
+      }
+
       return null;
     }
 
     function parseTimeParts(value) {
       if (value === null || value === undefined || value === "") return null;
-      if (value instanceof Date && !isNaN(value)) return { hours: value.getHours(), minutes: value.getMinutes() };
+
+      if (value instanceof Date && !isNaN(value)) {
+        return {
+          hours: value.getHours(),
+          minutes: value.getMinutes()
+        };
+      }
 
       if (typeof value === "number" && value > 0 && value < 1) {
         const totalMinutes = Math.round(value * 24 * 60);
-        return { hours: Math.floor(totalMinutes / 60), minutes: totalMinutes % 60 };
+
+        return {
+          hours: Math.floor(totalMinutes / 60),
+          minutes: totalMinutes % 60
+        };
       }
 
       let text = String(value).trim().toUpperCase();
+
+      if (!text) return null;
+
       let ampm = "";
-      if (text.endsWith("AM")) { ampm = "AM"; text = text.slice(0, -2).trim(); }
-      if (text.endsWith("PM")) { ampm = "PM"; text = text.slice(0, -2).trim(); }
+
+      if (text.endsWith("AM")) {
+        ampm = "AM";
+        text = text.slice(0, -2).trim();
+      }
+
+      if (text.endsWith("PM")) {
+        ampm = "PM";
+        text = text.slice(0, -2).trim();
+      }
 
       const parts = text.split(":");
-      if (parts.length > 2) return null;
-      let hours = Number(parts[0]);
-      let minutes = parts.length === 2 ? Number(parts[1]) : 0;
-      if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
 
-      if (ampm === "PM" && hours < 12) hours += 12;
-      if (ampm === "AM" && hours === 12) hours = 0;
-      return { hours: hours, minutes: minutes };
+      if (parts.length > 3) return null;
+
+      let hours = Number(parts[0]);
+      let minutes = parts.length >= 2 ? Number(parts[1]) : 0;
+
+      if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+        return null;
+      }
+
+      if (ampm === "PM" && hours < 12) {
+        hours += 12;
+      }
+
+      if (ampm === "AM" && hours === 12) {
+        hours = 0;
+      }
+
+      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+        return null;
+      }
+
+      return {
+        hours: hours,
+        minutes: minutes
+      };
+    }
+
+    function formatTimeParts(timeParts) {
+      let hours = timeParts.hours;
+      const minutes = timeParts.minutes;
+      const suffix = hours >= 12 ? "PM" : "AM";
+
+      hours = hours % 12;
+
+      if (hours === 0) {
+        hours = 12;
+      }
+
+      return hours + ":" + String(minutes).padStart(2, "0") + " " + suffix;
     }
 
     function parseDurationMinutes(value, fallbackMinutes) {
-      if (value === null || value === undefined || value === "") return fallbackMinutes;
+      if (value === null || value === undefined || value === "") {
+        return fallbackMinutes;
+      }
 
       if (typeof value === "number") {
-        if (value > 0 && value < 1) return Math.round(value * 24 * 60);
-        if (value < 10000) return Math.round(value);
+        if (value > 0 && value < 1) {
+          return Math.round(value * 24 * 60);
+        }
+
+        if (value < 10000) {
+          return Math.round(value);
+        }
       }
 
       const text = String(value).trim().toLowerCase();
-      if (!text) return fallbackMinutes;
+
+      if (!text) {
+        return fallbackMinutes;
+      }
 
       if (text.includes(":")) {
         const parts = text.split(":");
+
         if (parts.length >= 2) {
           const hours = Number(parts[0]);
           const minutes = Number(parts[1]);
-          if (Number.isFinite(hours) && Number.isFinite(minutes)) return hours * 60 + minutes;
+
+          if (Number.isFinite(hours) && Number.isFinite(minutes)) {
+            return hours * 60 + minutes;
+          }
         }
       }
 
       const number = firstNumber(text);
-      if (number === null) return fallbackMinutes;
-      if (text.includes("hour") || text.includes("hr") || text.endsWith("h")) return Math.round(number * 60);
+
+      if (number === null) {
+        return fallbackMinutes;
+      }
+
+      if (text.includes("hour") || text.includes("hr") || text.endsWith("h")) {
+        return Math.round(number * 60);
+      }
+
       return Math.round(number);
     }
 
     function getValue(row, possibleNames) {
       if (!row || typeof row !== "object") return "";
+
       const normalizedRow = {};
-      Object.keys(row).forEach(function(key) { normalizedRow[normalizeHeader(key)] = row[key]; });
+
+      Object.keys(row).forEach(function(key) {
+        normalizedRow[normalizeHeader(key)] = row[key];
+      });
 
       for (let i = 0; i < possibleNames.length; i++) {
         const value = normalizedRow[normalizeHeader(possibleNames[i])];
-        if (value !== undefined && value !== null && value !== "") return value;
+
+        if (value !== undefined && value !== null && value !== "") {
+          return value;
+        }
       }
+
       return "";
     }
 
     function normalizeHeader(value) {
       const text = String(value || "").toLowerCase();
       let output = "";
+
       for (let i = 0; i < text.length; i++) {
         const code = text.charCodeAt(i);
         const isLetter = code >= 97 && code <= 122;
         const isNumber = code >= 48 && code <= 57;
-        if (isLetter || isNumber) output += text[i];
+
+        if (isLetter || isNumber) {
+          output += text[i];
+        }
       }
+
       return output;
     }
 
     function normalizeText(value) {
       const text = String(value || "").trim().toUpperCase();
       let output = "";
+
       for (let i = 0; i < text.length; i++) {
-        if (text[i] !== " ") output += text[i];
+        if (text[i] !== " ") {
+          output += text[i];
+        }
       }
+
       return output;
     }
 
     function isSimpleNumber(text) {
       if (!text) return false;
+
       const n = Number(text);
+
       return Number.isFinite(n);
     }
 
     function looksLikeOnlyTime(text) {
       const clean = text.trim().toUpperCase();
+
       if (clean.includes("/")) return false;
       if (clean.includes("-")) return false;
       if (clean.includes(",")) return false;
       if (clean.includes("T")) return false;
       if (!clean.includes(":")) return false;
+
       return parseTimeParts(clean) !== null;
     }
 
     function firstNumber(text) {
       let current = "";
+
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
         const isDigit = char >= "0" && char <= "9";
+
         if (isDigit || char === ".") {
           current += char;
         } else if (current) {
           break;
         }
       }
+
       if (!current) return null;
+
       const number = Number(current);
+
       return Number.isFinite(number) ? number : null;
     }
 
@@ -728,45 +1423,99 @@
       const localProgress = rawIndex - startIndex;
       const start = vanRoute[startIndex];
       const end = vanRoute[endIndex];
+
       van.style.left = start.left + (end.left - start.left) * localProgress + "px";
       van.style.top = start.top + (end.top - start.top) * localProgress + "px";
+
       washMarker.style.display = stageIndex >= 2 ? "flex" : "none";
     }
 
     function updateSteps(activeStep) {
       steps.forEach(function(step, index) {
         step.classList.remove("active", "done");
-        if (index < activeStep) step.classList.add("done");
-        else if (index === activeStep) step.classList.add("active");
+
+        if (index < activeStep) {
+          step.classList.add("done");
+        } else if (index === activeStep) {
+          step.classList.add("active");
+        }
       });
     }
 
     function isBeforeCalendarDate(firstDate, secondDate) {
       if (!firstDate || !secondDate) return false;
-      const first = new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate()).getTime();
-      const second = new Date(secondDate.getFullYear(), secondDate.getMonth(), secondDate.getDate()).getTime();
+
+      const first = new Date(
+        firstDate.getFullYear(),
+        firstDate.getMonth(),
+        firstDate.getDate()
+      ).getTime();
+
+      const second = new Date(
+        secondDate.getFullYear(),
+        secondDate.getMonth(),
+        secondDate.getDate()
+      ).getTime();
+
       return first < second;
     }
 
-    function addMinutes(date, minutes) { return new Date(date.getTime() + minutes * 60000); }
-    function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+    function addMinutes(date, minutes) {
+      return new Date(date.getTime() + minutes * 60000);
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
     function scaleBetween(now, start, end, outputMin, outputMax) {
       const ratio = clamp((now - start) / Math.max(1, end - start), 0, 1);
+
       return outputMin + (outputMax - outputMin) * ratio;
     }
+
     function formatDateTime(date) {
-      if (!date || isNaN(date)) return "Not listed";
-      return date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+      if (!date || isNaN(date)) {
+        return "Not listed";
+      }
+
+      return date.toLocaleString([], {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
     }
-    function showError(message) { errorBox.style.display = "block"; errorBox.textContent = message; successBox.style.display = "none"; }
-    function showSuccess(message) { successBox.style.display = "block"; successBox.textContent = message; errorBox.style.display = "none"; }
-    function hideMessages() { errorBox.style.display = "none"; successBox.style.display = "none"; }
-    function stopTimers() { clearInterval(refreshTimer); clearInterval(countdownTimer); refreshTimer = null; countdownTimer = null; }
+
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message;
+      successBox.style.display = "none";
+    }
+
+    function showSuccess(message) {
+      successBox.style.display = "block";
+      successBox.textContent = message;
+      errorBox.style.display = "none";
+    }
+
+    function hideMessages() {
+      errorBox.style.display = "none";
+      successBox.style.display = "none";
+    }
+
+    function stopTimers() {
+      clearInterval(refreshTimer);
+      clearInterval(countdownTimer);
+      refreshTimer = null;
+      countdownTimer = null;
+    }
 
     function resetTracker() {
       selectedRow = null;
       selectedConfirmation = "";
       confirmationInput.value = "";
+
       stopTimers();
       hideMessages();
       resetVisuals();
@@ -781,8 +1530,12 @@
       appointmentTime.textContent = "--";
       currentStep.textContent = "--";
       washMarker.style.display = "none";
+
       moveVan(0, 0);
-      steps.forEach(function(step) { step.classList.remove("active", "done"); });
+
+      steps.forEach(function(step) {
+        step.classList.remove("active", "done");
+      });
     }
 
     resetVisuals();
