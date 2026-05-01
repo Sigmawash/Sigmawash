@@ -1129,6 +1129,7 @@
     const state = document.getElementById('state');
     const zipCode = document.getElementById('zipCode');
     const address = document.getElementById('address');
+    const appointmentDate = document.getElementById('appointmentDate');
     const appointmentTime = document.getElementById('appointmentTime');
     const selectedAddOns = document.getElementById('selectedAddOns');
     const confirmationNumberInput = document.getElementById('confirmationNumber');
@@ -1577,6 +1578,49 @@
       return isValid;
     }
 
+    function getLocalDateValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function setMinimumAppointmentDate() {
+      appointmentDate.min = getLocalDateValue(new Date());
+    }
+
+    function validateDate() {
+      setMinimumAppointmentDate();
+
+      if (!appointmentDate.value) {
+        appointmentDate.setCustomValidity('');
+        return false;
+      }
+
+      const todayValue = appointmentDate.min;
+      const isValid = appointmentDate.value >= todayValue;
+
+      appointmentDate.setCustomValidity(
+        isValid ? '' : 'Please choose today or a future date.'
+      );
+
+      return isValid;
+    }
+
+    function getMinimumAllowedMinutesForDate(selectedDate) {
+      const todayValue = getLocalDateValue(new Date());
+
+      if (selectedDate !== todayValue) {
+        return null;
+      }
+
+      const now = new Date();
+      const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+      const oneHourFromNowMinutes = oneHourFromNow.getHours() * 60 + oneHourFromNow.getMinutes();
+
+      return Math.ceil(oneHourFromNowMinutes / 15) * 15;
+    }
+
     function validateTime() {
       const value = appointmentTime.value;
 
@@ -1586,14 +1630,25 @@
       }
 
       const parts = value.split(':');
-      const minutes = Number(parts[1]);
-      const isValid = Number.isInteger(minutes) && minutes % 5 === 0;
+      const selectedHour = Number(parts[0]);
+      const selectedMinute = Number(parts[1]);
+      const selectedMinutes = selectedHour * 60 + selectedMinute;
+      const isValidInterval = Number.isInteger(selectedMinute) && selectedMinute % 15 === 0;
 
-      appointmentTime.setCustomValidity(
-        isValid ? '' : 'Please choose a time in 5-minute increments only.'
-      );
+      if (!isValidInterval) {
+        appointmentTime.setCustomValidity('Please choose a time in 15-minute increments only.');
+        return false;
+      }
 
-      return isValid;
+      const minimumAllowedMinutes = getMinimumAllowedMinutesForDate(appointmentDate.value);
+
+      if (minimumAllowedMinutes !== null && selectedMinutes < minimumAllowedMinutes) {
+        appointmentTime.setCustomValidity('Please choose a time at least 1 hour from now.');
+        return false;
+      }
+
+      appointmentTime.setCustomValidity('');
+      return true;
     }
 
     function validateCustomFields() {
@@ -1607,9 +1662,10 @@
       const cityValid = validateCity();
       const stateValid = validateState();
       const zipValid = validateZipCode();
+      const dateValid = validateDate();
       const timeValid = validateTime();
 
-      return firstNameValid && lastNameValid && phoneValid && streetValid && cityValid && stateValid && zipValid && timeValid;
+      return firstNameValid && lastNameValid && phoneValid && streetValid && cityValid && stateValid && zipValid && dateValid && timeValid;
     }
 
     function updateSelectedAddOns() {
@@ -1771,12 +1827,24 @@
     }
 
    function buildTimeOptions() {
+    setMinimumAppointmentDate();
+
     const options = ['<option value="">Select a time</option>'];
+
+    if (appointmentDate.value && !validateDate()) {
+      appointmentTime.innerHTML = options.join('');
+      return;
+    }
 
     const startMinutes = 8 * 60;   // 8:00 AM
     const endMinutes = 20 * 60;    // 8:00 PM
+    const minimumAllowedMinutes = getMinimumAllowedMinutesForDate(appointmentDate.value);
 
-    for (let totalMinutes = startMinutes; totalMinutes <= endMinutes; totalMinutes += 5) {
+    for (let totalMinutes = startMinutes; totalMinutes <= endMinutes; totalMinutes += 15) {
+      if (minimumAllowedMinutes !== null && totalMinutes < minimumAllowedMinutes) {
+        continue;
+      }
+
       const hour = Math.floor(totalMinutes / 60);
       const minute = totalMinutes % 60;
 
@@ -1795,7 +1863,12 @@
       options.push(`<option value="${value}">${label}</option>`);
     }
 
+    if (options.length === 1) {
+      options.push('<option value="" disabled>No times available today</option>');
+    }
+
     appointmentTime.innerHTML = options.join('');
+    validateTime();
   }
 
     menuToggle.addEventListener('click', () => {
@@ -1859,6 +1932,14 @@
       updateFullAddress();
     });
 
+    appointmentDate.addEventListener('change', () => {
+      validateDate();
+      buildTimeOptions();
+    });
+    appointmentDate.addEventListener('input', () => {
+      validateDate();
+      buildTimeOptions();
+    });
     appointmentTime.addEventListener('change', validateTime);
 
     vehicleMake.addEventListener('input', () => {
@@ -1904,6 +1985,7 @@
       }
     });
 
+    setMinimumAppointmentDate();
     buildTimeOptions();
     updateSubmitState();
     updateSelectedAddOns();
@@ -1957,7 +2039,7 @@
         vehicleMake: vehicleMake.value.trim(),
         vehicleModel: vehicleModel.value.trim(),
         address: address.value.trim(),
-        appointmentDate: document.getElementById('appointmentDate').value,
+        appointmentDate: appointmentDate.value,
         appointmentTime: appointmentTime.value,
         serviceType: selectedService.value,
         addOns: selectedAddOns.value ? selectedAddOns.value : 'None',
@@ -1986,6 +2068,7 @@
       showConfirmation();
 
       form.reset();
+      buildTimeOptions();
       submitButton.disabled = true;
       formSubmitted = false;
       activeDiscount = null;
