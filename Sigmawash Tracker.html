@@ -533,7 +533,7 @@
   </main>
 
   <script>
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwQHBgknDwc4YZPEswDCxp_YhZx0RJmniCN6-gBF_T4IRMqkmquVsOSyzECYtwpuRec6w/exec";
+    const SHEET_API_URL = "https://sigmawash-booking.quantitativemidwest.workers.dev/";
 
     const DEFAULT_DRIVING_MINUTES = 20;
     const DEFAULT_ARRIVAL_MINUTES = 5;
@@ -675,7 +675,8 @@
         script.src =
           SHEET_API_URL +
           separator +
-          "callback=" +
+          "action=getAppointment" +
+          "&callback=" +
           encodeURIComponent(callbackName) +
           "&confirmation=" +
           encodeURIComponent(confirmation) +
