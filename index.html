@@ -1095,8 +1095,8 @@
 
     <div class="confirmation-content">
       <button type="button" class="close-confirmation" id="closeConfirmation">✕</button>
-      <h3>Car Wash Booked</h3>
-      <p>Your Sigma Wash car wash is booked.</p>
+      <h3>Order Confirmation</h3>
+      <p>We look forward to seeing you!</p>
       <div class="confirmation-message" id="confirmationMessage"></div>
       <div class="confirmation-actions">
         <button type="button" class="button" onclick="window.location.href='https://square.link/u/fp69AP9J';">
@@ -1755,7 +1755,7 @@
 
     function buildConfirmationText(details) {
       return (
-        'Order Confirmation\n' +
+        'Order Confirmation Details\n' +
         'Confirmation Number: ' + details.confirmationNumber + '\n' +
         'Customer: ' + details.customerName + '\n' +
         'Phone: ' + details.phoneNumber + '\n' +
@@ -1769,6 +1769,7 @@
         'Date: ' + formatBookingDate(details.appointmentDate) + '\n' +
         'Time: ' + formatBookingTime(details.appointmentTime) + '\n' +
         'Address: ' + details.address + '\n' +
+        '\n' +
         'Payment is collected upon completion of services. Press "Pay Now" button if you wish to pay in advance. We accept all major forms of payment including Google Pay and Apple Pay and we offer a money-back satisfaction guarantee.'
       );
     }
