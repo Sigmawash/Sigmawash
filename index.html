@@ -885,7 +885,7 @@
         <section class="glass-card booking-bottom" id="booking">
           <h2>Order Here</h2>
           <p class="subtext">
-            Enter your details below. Payment is collected upon completion of services. Press "Pay Now" button after ordering if you wish to pay in advance. We accept all major forms of payment including Google Pay and Apple Pay and we offer a money-back satisfaction guarantee.
+            Enter your details below. Payment is collected upon completion of services. Press "Pay Now" button after ordering if you wish to pay in advance. We accept all major forms of payment including Google Pay and Apple Pay and we offer a money-back satisfaction guarantee. No tipping required. All of our employees are compensated on an hourly basis.
           </p>
 
           <form
@@ -1756,6 +1756,7 @@
     function buildConfirmationText(details) {
       return (
         'Order Confirmation Details\n' +
+        '\n' +
         'Confirmation Number: ' + details.confirmationNumber + '\n' +
         'Customer: ' + details.customerName + '\n' +
         'Phone: ' + details.phoneNumber + '\n' +
@@ -1770,7 +1771,7 @@
         'Time: ' + formatBookingTime(details.appointmentTime) + '\n' +
         'Address: ' + details.address + '\n' +
         '\n' +
-        'Payment is collected upon completion of services. Press "Pay Now" button if you wish to pay in advance. We accept all major forms of payment including Google Pay and Apple Pay and we offer a money-back satisfaction guarantee.'
+        'Payment is collected upon completion of services. Press "Pay Now" button if you wish to pay in advance. We accept all major forms of payment including Google Pay and Apple Pay and we offer a money-back satisfaction guarantee. No tipping required. All of our employees are compensated on an hourly basis.'
       );
     }
 
