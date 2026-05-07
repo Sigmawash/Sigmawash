@@ -1099,7 +1099,7 @@
       <p>We look forward to seeing you!</p>
       <div class="confirmation-message" id="confirmationMessage"></div>
       <div class="confirmation-actions">
-        <button type="button" class="button" onclick="window.location.href='https://square.link/u/fp69AP9J';">
+        <button type="button" class="button" id="payNowButton">
           Pay Now
         </button>
         <button type="button" class="secondary-button" id="printConfirmation">Print</button>
@@ -1151,6 +1151,7 @@
     const confirmationMessage = document.getElementById('confirmationMessage');
     const printConfirmation = document.getElementById('printConfirmation');
     const downloadConfirmation = document.getElementById('downloadConfirmation');
+    const payNowButton = document.getElementById('payNowButton');
 
     const discountCodeInput = document.getElementById('discountCodeInput');
     const applyDiscountButton = document.getElementById('applyDiscountButton');
@@ -1183,6 +1184,10 @@
     let pendingBookingDetails = null;
     let latestConfirmationText = '';
     let latestConfirmationNumber = '';
+    let latestBookingDetails = null;
+
+    const SQUARE_PAYMENT_FALLBACK_URL = 'https://square.link/u/fp69AP9J';
+    const PAYMENT_LINK_ENDPOINT_ACTION = 'createSquarePaymentLink';
     let discountCodes = [];
     let discountCodesLoaded = false;
     let discountCodesPromise = null;
@@ -1833,6 +1838,102 @@
       URL.revokeObjectURL(url);
     }
 
+
+    function parseCurrencyAmount(value) {
+      const numericValue = Number(String(value || '').replace(/[^0-9.]/g, ''));
+      return Number.isFinite(numericValue) ? roundCurrency(numericValue) : 0;
+    }
+
+    function getPaymentAmountFromLatestBooking() {
+      if (!latestBookingDetails) return 0;
+
+      const discountedAmount = parseCurrencyAmount(latestBookingDetails.discountedPrice);
+      const originalAmount = parseCurrencyAmount(latestBookingDetails.originalPrice);
+
+      return discountedAmount > 0 ? discountedAmount : originalAmount;
+    }
+
+    function getPaymentLinkEndpointUrl() {
+      const separator = form.action.includes('?') ? '&' : '?';
+      return form.action + separator + 'action=' + encodeURIComponent(PAYMENT_LINK_ENDPOINT_ACTION);
+    }
+
+    async function createSquarePaymentLink() {
+      const paymentAmount = getPaymentAmountFromLatestBooking();
+
+      if (!latestBookingDetails || !paymentAmount) {
+        return null;
+      }
+
+      const response = await fetch(getPaymentLinkEndpointUrl(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: PAYMENT_LINK_ENDPOINT_ACTION,
+          confirmationNumber: latestBookingDetails.confirmationNumber,
+          customerName: latestBookingDetails.customerName,
+          phoneNumber: latestBookingDetails.phoneNumber,
+          serviceType: latestBookingDetails.serviceType,
+          addOns: latestBookingDetails.addOns,
+          discountCode: latestBookingDetails.discountCode,
+          discountPercentage: latestBookingDetails.discountPercentage,
+          originalPrice: latestBookingDetails.originalPrice,
+          discountedPrice: latestBookingDetails.discountedPrice,
+          amount: paymentAmount.toFixed(2),
+          appointmentDate: latestBookingDetails.appointmentDate,
+          appointmentTime: latestBookingDetails.appointmentTime,
+          address: latestBookingDetails.address
+        })
+      });
+
+      let result = null;
+
+      try {
+        result = await response.json();
+      } catch (error) {
+        result = null;
+      }
+
+      if (!response.ok || !result || !result.url) {
+        const message = result && result.error
+          ? result.error
+          : 'Could not create the Square checkout link.';
+        throw new Error(message);
+      }
+
+      return result.url;
+    }
+
+    async function handlePayNowClick() {
+      const paymentAmount = getPaymentAmountFromLatestBooking();
+
+      if (!latestBookingDetails || !paymentAmount) {
+        window.location.href = SQUARE_PAYMENT_FALLBACK_URL;
+        return;
+      }
+
+      const originalText = payNowButton.textContent;
+      payNowButton.disabled = true;
+      payNowButton.textContent = 'Opening Square...';
+
+      try {
+        const squareCheckoutUrl = await createSquarePaymentLink();
+        window.location.href = squareCheckoutUrl;
+      } catch (error) {
+        alert(
+          'We could not automatically create the Square checkout page. ' +
+          'The standard payment page will open. Please enter ' +
+          formatCurrency(paymentAmount) + '.'
+        );
+        window.location.href = SQUARE_PAYMENT_FALLBACK_URL;
+      } finally {
+        payNowButton.disabled = false;
+        payNowButton.textContent = originalText;
+      }
+    }
+
    function buildTimeOptions() {
     setMinimumAppointmentDate();
 
@@ -1906,6 +2007,7 @@
     confirmationOverlay.addEventListener('click', hideConfirmation);
     printConfirmation.addEventListener('click', printConfirmationMessage);
     downloadConfirmation.addEventListener('click', downloadConfirmationMessage);
+    payNowButton.addEventListener('click', handlePayNowClick);
 
     firstName.addEventListener('input', () => {
       validateFirstName();
@@ -2065,6 +2167,7 @@
     hiddenSubmitFrame.addEventListener('load', function () {
       if (!formSubmitted || !pendingBookingDetails) return;
 
+      latestBookingDetails = { ...pendingBookingDetails };
       latestConfirmationNumber = pendingBookingDetails.confirmationNumber;
       latestConfirmationText = buildConfirmationText(pendingBookingDetails);
       confirmationMessage.textContent = latestConfirmationText;
