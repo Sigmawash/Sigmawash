@@ -779,8 +779,13 @@
         "How Long Driving",
         "How Long Driveing",
         "Drive Time",
-        "Drive Minutes"
+        "Drive Minutes",
+        "Time To Drive",
+        "Time to Drive",
+        "timeToDrive"
       ]);
+
+      const forceFinished = hasDoneValue(drivingRaw);
 
       const arriveRaw = getValue(row, [
         "Arrive",
@@ -813,7 +818,7 @@
       const washingTimestamp = parseDateValue(washingRaw);
       const finishedTimestamp = parseDateValue(finishedRaw);
 
-      const hasDrivingValue = String(drivingRaw || "").trim() !== "";
+      const hasDrivingValue = String(drivingRaw || "").trim() !== "" && !forceFinished;
 
       const drivingMinutes = hasDrivingValue
         ? parseDurationMinutes(drivingRaw, DEFAULT_DRIVING_MINUTES)
@@ -853,7 +858,8 @@
         drivingStart: drivingStart,
         arriveStart: arriveStart,
         washingStart: washingStart,
-        finishedTime: finishedTime
+        finishedTime: finishedTime,
+        forceFinished: forceFinished
       };
     }
 
@@ -861,6 +867,19 @@
       const appointmentStart = timeline.appointmentStart;
       const timestamp2 = timeline.timestamp2;
       const drivingStart = timeline.drivingStart;
+
+      if (timeline.forceFinished) {
+        return {
+          title: "Finished",
+          message: "Your SigmaWash service is complete.",
+          stageIndex: 3,
+          stepName: "Finished",
+          minutesLeft: 0,
+          etaLabel: "complete",
+          progressPercent: 100,
+          mapProgress: 1
+        };
+      }
 
       if (!timestamp2) {
         return {
@@ -966,6 +985,10 @@
       };
     }
 
+    function hasDoneValue(value) {
+      return String(value || "").trim().toLowerCase().includes("done");
+    }
+
     function formatAppointmentDisplay(row) {
       const dateValue = getValue(row, [
         "Appointment Date",
@@ -1048,11 +1071,7 @@
       if (value === null || value === undefined || value === "") return null;
 
       if (value instanceof Date && !isNaN(value)) {
-        return new Date(
-          value.getFullYear(),
-          value.getMonth(),
-          value.getDate()
-        );
+        return new Date(value.getFullYear(), value.getMonth(), value.getDate());
       }
 
       if (typeof value === "number") {
@@ -1104,30 +1123,18 @@
 
       if (monthTextMatch) {
         const months = {
-          jan: 0,
-          january: 0,
-          feb: 1,
-          february: 1,
-          mar: 2,
-          march: 2,
-          apr: 3,
-          april: 3,
+          jan: 0, january: 0,
+          feb: 1, february: 1,
+          mar: 2, march: 2,
+          apr: 3, april: 3,
           may: 4,
-          jun: 5,
-          june: 5,
-          jul: 6,
-          july: 6,
-          aug: 7,
-          august: 7,
-          sep: 8,
-          sept: 8,
-          september: 8,
-          oct: 9,
-          october: 9,
-          nov: 10,
-          november: 10,
-          dec: 11,
-          december: 11
+          jun: 5, june: 5,
+          jul: 6, july: 6,
+          aug: 7, august: 7,
+          sep: 8, sept: 8, september: 8,
+          oct: 9, october: 9,
+          nov: 10, november: 10,
+          dec: 11, december: 11
         };
 
         const monthName = monthTextMatch[1].toLowerCase();
@@ -1276,6 +1283,10 @@
 
       if (!text) {
         return fallbackMinutes;
+      }
+
+      if (hasDoneValue(text)) {
+        return 0;
       }
 
       if (text.includes(":")) {
