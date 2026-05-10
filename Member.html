@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sigma Wash Account</title>
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --panel: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: #e5e5e7;
+      --blue: #0071e3;
+      --blue-hover: #0077ed;
+      --green: #248a3d;
+      --red: #d70015;
+      --sidebar-width: 290px;
+      --radius-xl: 28px;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      --max-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 30px;
+    }
+
+    .auth-card h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.05em;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 22px;
+      background: #eef2f7;
+      padding: 6px;
+      border-radius: 16px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 13px;
+      padding: 12px;
+      cursor: pointer;
+      background: transparent;
+      font-weight: 700;
+      color: #475569;
+      font-family: inherit;
+    }
+
+    .tab.active {
+      background: #ffffff;
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      appearance: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(0, 113, 227, 0.55);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .button,
+    .secondary-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+      font-family: inherit;
+    }
+
+    .button {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .button:hover {
+      background: var(--blue-hover);
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      background: #bfc7d1;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.85;
+    }
+
+    .secondary-button {
+      background: #f2f2f5;
+      color: var(--text);
+    }
+
+    .secondary-button:hover {
+      background: #e9e9ee;
+      transform: translateY(-1px);
+    }
+
+    .full-button {
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .message {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      display: none;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .message.success {
+      display: block;
+      color: #065f46;
+      background: #d1fae5;
+      border: 1px solid #a7f3d0;
+    }
+
+    .message.error {
+      display: block;
+      color: #991b1b;
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+    }
+
+    .hint {
+      margin-top: 16px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--line);
+      padding: 28px 20px 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-brand {
+      padding: 8px 10px 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+
+    .brand-text {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+    }
+
+    .sidebar-copy {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.96rem;
+      padding: 0 10px;
+      margin-bottom: 22px;
+    }
+
+    .sidebar-group {
+      margin-bottom: 22px;
+    }
+
+    .sidebar-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .sidebar-nav a,
+    .sidebar-nav button {
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 0.98rem;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      background: transparent;
+      border: 0;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav button:hover {
+      background: #f0f3f6;
+      color: var(--blue);
+      transform: translateX(2px);
+    }
+
+    .sidebar-card {
+      margin-top: 26px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7f7fa 100%);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .sidebar-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
+
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: rgba(245, 245, 247, 0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .topbar-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .menu-toggle {
+      display: none;
+      border: 0;
+      background: #000;
+      color: #fff;
+      border-radius: 999px;
+      width: 42px;
+      height: 42px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .top-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: flex-end;
+    }
+
+    .menu a,
+    .menu button {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 500;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .menu a:hover,
+    .menu button:hover {
+      color: var(--text);
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 34px 28px 46px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 28px;
+      padding: 34px 0 34px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 5vw, 4.6rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+      font-weight: 700;
+      max-width: 9ch;
+    }
+
+    .hero-copy p {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.65;
+      max-width: 48ch;
+    }
+
+    .glass-card {
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .glass-card h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      letter-spacing: -0.04em;
+    }
+
+    .glass-card .subtext {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 58ch;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .mini-card {
+      background: linear-gradient(180deg, #ffffff 0%, #fafafd 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .mini-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .mini-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .metric {
+      font-size: 2.25rem;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      background: #f2f2f5;
+      color: var(--text);
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .radio-group {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .radio-card {
+      position: relative;
+      display: block;
+      cursor: pointer;
+    }
+
+    .radio-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-card span {
+      display: block;
+      position: relative;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px 16px;
+      min-height: 94px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .radio-card small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .radio-card input:checked + span {
+      border-color: rgba(0, 113, 227, 0.6);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      background: #f5f9ff;
+      transform: translateY(-1px);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .status {
+      min-height: 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .overlay {
+      display: none;
+    }
+
+    .confirmation-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+    }
+
+    .confirmation-modal.show {
+      display: block;
+    }
+
+    .confirmation-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .confirmation-content {
+      position: relative;
+      width: min(700px, calc(100% - 30px));
+      max-height: 85vh;
+      overflow-y: auto;
+      margin: 5vh auto 0;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .confirmation-content h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .confirmation-content p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .close-confirmation {
+      float: right;
+      border: none;
+      background: #f2f2f5;
+      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .confirmation-message {
+      background: #f8f9fb;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      white-space: pre-line;
+      line-height: 1.65;
+      color: var(--text);
+      margin-top: 12px;
+    }
+
+    @media (max-width: 1180px) {
+      .info-grid,
+      .radio-group {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        display: none;
+      }
+
+      .overlay.show {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(29, 29, 31, 0.26);
+        z-index: 950;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page,
+      .topbar-inner {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .form-grid,
+      .info-grid,
+      .radio-group {
+        grid-template-columns: 1fr;
+      }
+
+      .glass-card,
+      .mini-card {
+        border-radius: 24px;
+      }
+
+      .actions {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .button,
+      .secondary-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="auth-screen" id="authScreen">
+    <div class="auth-card">
+      <h1>Sigma Wash</h1>
+      <p class="subtitle">
+        Create an account once, save your phone, address, and preferred car, then request washes without typing everything again.
+      </p>
+
+      <div class="tabs">
+        <button class="tab active" id="loginTab" type="button" onclick="showAuthForm('login')">Log in</button>
+        <button class="tab" id="signupTab" type="button" onclick="showAuthForm('signup')">Sign up</button>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <label for="loginPhone">Phone Number</label>
+        <input id="loginPhone" type="tel" autocomplete="tel" placeholder="312-555-1234" required />
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required />
+
+        <button class="button full-button" id="loginButton" type="submit">Log in</button>
+      </form>
+
+      <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="signupFullName">Full Name</label>
+            <input id="signupFullName" autocomplete="name" placeholder="Full name" required />
+          </div>
+
+          <div class="field">
+            <label for="signupPhone">Phone Number</label>
+            <input id="signupPhone" type="tel" autocomplete="tel" placeholder="312-555-1234" required />
+          </div>
+
+          <div class="field">
+            <label for="signupPassword">Password</label>
+            <input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required />
+          </div>
+
+          <div class="field full">
+            <label for="signupStreetAddress">Street Address</label>
+            <input id="signupStreetAddress" autocomplete="address-line1" placeholder="123 Main St" required />
+          </div>
+
+          <div class="field">
+            <label for="signupCity">City</label>
+            <input id="signupCity" autocomplete="address-level2" placeholder="Chicago" required />
+          </div>
+
+          <div class="field">
+            <label for="signupState">State</label>
+            <input id="signupState" autocomplete="address-level1" maxlength="2" placeholder="IL" required />
+          </div>
+
+          <div class="field">
+            <label for="signupZipCode">Zip Code</label>
+            <input id="signupZipCode" inputmode="numeric" autocomplete="postal-code" placeholder="60601" required />
+          </div>
+
+          <div class="field">
+            <label for="signupVehicleColor">Preferred Car Color</label>
+            <input id="signupVehicleColor" placeholder="Black" required />
+          </div>
+
+          <div class="field">
+            <label for="signupVehicleMake">Preferred Car Make</label>
+            <input id="signupVehicleMake" placeholder="Toyota" required />
+          </div>
+
+          <div class="field">
+            <label for="signupVehicleModel">Preferred Car Model</label>
+            <input id="signupVehicleModel" placeholder="Camry" required />
+          </div>
+
+          <div class="field full">
+            <button class="button full-button" id="signupButton" type="submit">Create account</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="authMessage" class="message"></div>
+
+      <p class="hint">
+        Login uses your phone number. Passwords are checked through the backend and are not stored as readable text.
+      </p>
+    </div>
+  </section>
+
+  <div class="layout hidden" id="dashboardScreen">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-text">Sigma Wash</div>
+      </div>
+
+      <p class="sidebar-copy">
+        Your account dashboard for subscription details, saved information, and car wash requests.
+      </p>
+
+      <div class="sidebar-group">
+        <div class="sidebar-label">Account</div>
+        <nav class="sidebar-nav">
+          <a href="#overview">Overview</a>
+          <a href="#savedInfo">Saved Info</a>
+          <a href="#request">Request Car Wash</a>
+          <button type="button" onclick="logout()">Log out</button>
+        </nav>
+      </div>
+
+      <div class="sidebar-card">
+        <strong id="sidebarName">Welcome</strong>
+        <p id="sidebarSubscription">Subscription details loading...</p>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="topbar-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Open sidebar">☰</button>
+            <div class="top-title">Sigma Wash Account</div>
+          </div>
+
+          <nav class="menu" aria-label="Top navigation">
+            <a href="#overview">Overview</a>
+            <a href="#savedInfo">Saved Info</a>
+            <a href="#request">Request</a>
+            <button type="button" onclick="logout()">Log out</button>
+          </nav>
+        </div>
+      </header>
+
+      <div class="page">
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">Welcome back</div>
+            <h1 id="heroName">Your wash dashboard</h1>
+            <p>
+              Your saved phone, address, and preferred vehicle are already connected to your account.
+            </p>
+          </div>
+        </section>
+
+        <section class="glass-card" id="overview">
+          <h2>Account Overview</h2>
+          <p class="subtext">
+            These details come from your Google Sheet account record.
+          </p>
+
+          <div class="info-grid">
+            <div class="mini-card">
+              <h3>Subscription</h3>
+              <div class="metric" id="subscriptionType">—</div>
+              <p>Your current plan type.</p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Washes Remaining</h3>
+              <div class="metric" id="washesRemaining">0</div>
+              <p>One wash is used when a request is submitted.</p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Phone Login</h3>
+              <span class="badge" id="accountPhone">—</span>
+              <p style="margin-top: 12px;">
+                Last login: <span id="lastLoginAt">—</span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass-card" id="savedInfo">
+          <h2>Saved Information</h2>
+          <p class="subtext">
+            This information is used to prefill your car wash requests.
+          </p>
+
+          <div class="info-grid">
+            <div class="mini-card">
+              <h3>Customer</h3>
+              <p id="savedCustomer">—</p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Address</h3>
+              <p id="savedAddress">—</p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Preferred Car</h3>
+              <p id="savedVehicle">—</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass-card" id="request">
+          <h2>Request a Car Wash</h2>
+          <p class="subtext">
+            Your saved profile information is filled in automatically. You can edit it for this request if needed.
+          </p>
+
+          <form id="washRequestForm" onsubmit="handleWashRequest(event)">
+            <div class="form-grid">
+              <div class="field full">
+                <label>Service Type</label>
+
+                <div class="radio-group">
+                  <label class="radio-card">
+                    <input type="radio" name="serviceType" value="Exterior Fresh" required />
+                    <span>
+                      Exterior Fresh
+                      <small>Exterior hand wash</small>
+                    </span>
+                  </label>
+
+                  <label class="radio-card">
+                    <input type="radio" name="serviceType" value="Interior Fresh" required />
+                    <span>
+                      Interior Fresh
+                      <small>Interior cleaning</small>
+                    </span>
+                  </label>
+
+                  <label class="radio-card">
+                    <input type="radio" name="serviceType" value="Total Fresh" required />
+                    <span>
+                      Total Fresh
+                      <small>Exterior and interior</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="requestPhone">Phone Number</label>
+                <input id="requestPhone" type="tel" autocomplete="tel" required />
+              </div>
+
+              <div class="field">
+                <label for="vehicleColor">Car Color</label>
+                <input id="vehicleColor" required />
+              </div>
+
+              <div class="field">
+                <label for="vehicleMake">Car Make</label>
+                <input id="vehicleMake" required />
+              </div>
+
+              <div class="field">
+                <label for="vehicleModel">Car Model</label>
+                <input id="vehicleModel" required />
+              </div>
+
+              <div class="field">
+                <label for="streetAddress">Street Address</label>
+                <input id="streetAddress" autocomplete="address-line1" required />
+              </div>
+
+              <div class="field">
+                <label for="city">City</label>
+                <input id="city" autocomplete="address-level2" required />
+              </div>
+
+              <div class="field">
+                <label for="state">State</label>
+                <input id="state" autocomplete="address-level1" maxlength="2" required />
+              </div>
+
+              <div class="field">
+                <label for="zipCode">Zip Code</label>
+                <input id="zipCode" inputmode="numeric" autocomplete="postal-code" required />
+              </div>
+
+              <div class="field">
+                <label for="appointmentDate">Date</label>
+                <input id="appointmentDate" type="date" required />
+              </div>
+
+              <div class="field">
+                <label for="appointmentTime">Time</label>
+                <select id="appointmentTime" required>
+                  <option value="">Select a time</option>
+                </select>
+              </div>
+
+              <div class="field full">
+                <label for="requestNotes">Notes</label>
+                <textarea id="requestNotes" placeholder="Gate code, parking details, special instructions, etc."></textarea>
+              </div>
+
+              <div class="field full">
+                <div class="actions">
+                  <button class="button" id="requestButton" type="submit">Send Request</button>
+                  <button class="secondary-button" type="button" onclick="prefillRequestForm()">Use Saved Info</button>
+                  <div class="status" id="requestStatus"></div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="confirmation-modal" id="confirmationModal">
+    <div class="confirmation-overlay" id="confirmationOverlay"></div>
+
+    <div class="confirmation-content">
+      <button type="button" class="close-confirmation" id="closeConfirmation">✕</button>
+      <h3>Request Sent</h3>
+      <p>Your car wash request has been submitted.</p>
+      <div class="confirmation-message" id="confirmationMessage"></div>
+      <div style="margin-top: 18px;">
+        <button type="button" class="button" id="doneConfirmation">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /*
+      IMPORTANT:
+      This must be your Cloudflare Worker URL, not your Google Apps Script URL.
+      The secret token stays inside Cloudflare and Apps Script, not inside this HTML.
+    */
+    const API_URL = 'https://worker-sub.quantitativemidwest.workers.dev';
+
+    let sessionToken = '';
+    let currentAccount = null;
+
+    const authScreen = document.getElementById('authScreen');
+    const dashboardScreen = document.getElementById('dashboardScreen');
+
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
+    const loginTab = document.getElementById('loginTab');
+    const signupTab = document.getElementById('signupTab');
+    const authMessage = document.getElementById('authMessage');
+
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const menuToggle = document.getElementById('menuToggle');
+
+    const sidebarName = document.getElementById('sidebarName');
+    const sidebarSubscription = document.getElementById('sidebarSubscription');
+    const heroName = document.getElementById('heroName');
+    const subscriptionType = document.getElementById('subscriptionType');
+    const washesRemaining = document.getElementById('washesRemaining');
+    const accountPhone = document.getElementById('accountPhone');
+    const lastLoginAt = document.getElementById('lastLoginAt');
+
+    const savedCustomer = document.getElementById('savedCustomer');
+    const savedAddress = document.getElementById('savedAddress');
+    const savedVehicle = document.getElementById('savedVehicle');
+
+    const washRequestForm = document.getElementById('washRequestForm');
+    const requestButton = document.getElementById('requestButton');
+    const requestStatus = document.getElementById('requestStatus');
+    const appointmentDate = document.getElementById('appointmentDate');
+    const appointmentTime = document.getElementById('appointmentTime');
+
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmationOverlay = document.getElementById('confirmationOverlay');
+    const closeConfirmation = document.getElementById('closeConfirmation');
+    const doneConfirmation = document.getElementById('doneConfirmation');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+
+    function showAuthForm(type) {
+      const isLogin = type === 'login';
+
+      loginForm.classList.toggle('hidden', !isLogin);
+      signupForm.classList.toggle('hidden', isLogin);
+
+      loginTab.classList.toggle('active', isLogin);
+      signupTab.classList.toggle('active', !isLogin);
+
+      clearAuthMessage();
+    }
+
+    function showAuthMessage(text, type) {
+      authMessage.textContent = text;
+      authMessage.className = 'message ' + type;
+    }
+
+    function clearAuthMessage() {
+      authMessage.textContent = '';
+      authMessage.className = 'message';
+    }
+
+    function setBusy(buttonId, busy, normalText) {
+      const button = document.getElementById(buttonId);
+      button.disabled = busy;
+      button.textContent = busy ? 'Please wait...' : normalText;
+    }
+
+    async function callApi(action, data) {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: action,
+          data: data
+        })
+      });
+
+      const text = await response.text();
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        console.error('Raw server response:', text);
+        throw new Error('The server returned a non-JSON response. First part: ' + text.slice(0, 200));
+      }
+    }
+
+    async function handleSignup(event) {
+      event.preventDefault();
+      clearAuthMessage();
+      setBusy('signupButton', true, 'Create account');
+
+      try {
+        const payload = {
+          fullName: document.getElementById('signupFullName').value,
+          phoneNumber: document.getElementById('signupPhone').value,
+          password: document.getElementById('signupPassword').value,
+          streetAddress: document.getElementById('signupStreetAddress').value,
+          city: document.getElementById('signupCity').value,
+          state: document.getElementById('signupState').value,
+          zipCode: document.getElementById('signupZipCode').value,
+          preferredVehicleColor: document.getElementById('signupVehicleColor').value,
+          preferredVehicleMake: document.getElementById('signupVehicleMake').value,
+          preferredVehicleModel: document.getElementById('signupVehicleModel').value
+        };
+
+        const response = await callApi('signup', payload);
+
+        if (!response.ok) {
+          showAuthMessage(response.message || 'Could not create account.', 'error');
+          return;
+        }
+
+        signupForm.reset();
+        showAuthForm('login');
+        showAuthMessage(response.message || 'Account created. You can log in with your phone number now.', 'success');
+      } catch (error) {
+        showAuthMessage(error.message || 'Server error.', 'error');
+      } finally {
+        setBusy('signupButton', false, 'Create account');
+      }
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      clearAuthMessage();
+      setBusy('loginButton', true, 'Log in');
+
+      try {
+        const response = await callApi('login', {
+          phoneNumber: document.getElementById('loginPhone').value,
+          password: document.getElementById('loginPassword').value
+        });
+
+        if (!response.ok) {
+          showAuthMessage(response.message || 'Login failed.', 'error');
+          return;
+        }
+
+        sessionToken = response.sessionToken;
+        currentAccount = response.account;
+
+        loginForm.reset();
+        showDashboard();
+      } catch (error) {
+        showAuthMessage(error.message || 'Server error.', 'error');
+      } finally {
+        setBusy('loginButton', false, 'Log in');
+      }
+    }
+
+    function showDashboard() {
+      authScreen.classList.add('hidden');
+      dashboardScreen.classList.remove('hidden');
+
+      setMinimumAppointmentDate();
+      buildTimeOptions();
+      updateDashboardText();
+      prefillRequestForm();
+    }
+
+    function updateDashboardText() {
+      if (!currentAccount) return;
+
+      const fullName = currentAccount.fullName || 'there';
+      const plan = currentAccount.subscriptionType || 'No Active Subscription';
+      const washes = Number(currentAccount.washesRemaining || 0);
+
+      sidebarName.textContent = 'Welcome, ' + fullName;
+      sidebarSubscription.textContent = plan + ' · ' + washes + ' washes remaining';
+
+      heroName.textContent = 'Hi, ' + fullName;
+      subscriptionType.textContent = plan;
+      washesRemaining.textContent = washes;
+      accountPhone.textContent = currentAccount.phoneNumber || '—';
+      lastLoginAt.textContent = currentAccount.lastLoginAt || '—';
+
+      savedCustomer.textContent = [
+        currentAccount.fullName,
+        currentAccount.phoneNumber
+      ].filter(Boolean).join(' · ') || '—';
+
+      savedAddress.textContent = [
+        currentAccount.streetAddress,
+        currentAccount.city,
+        currentAccount.state,
+        currentAccount.zipCode
+      ].filter(Boolean).join(', ') || '—';
+
+      savedVehicle.textContent = [
+        currentAccount.preferredVehicleColor,
+        currentAccount.preferredVehicleMake,
+        currentAccount.preferredVehicleModel
+      ].filter(Boolean).join(' ') || '—';
+
+      if (washes <= 0) {
+        requestButton.disabled = true;
+        requestStatus.textContent = 'You do not have any washes remaining. Please contact Sigma Wash to renew or add washes.';
+        requestStatus.style.color = 'var(--red)';
+      } else {
+        requestButton.disabled = false;
+        requestStatus.textContent = '';
+      }
+    }
+
+    function prefillRequestForm() {
+      if (!currentAccount) return;
+
+      document.getElementById('requestPhone').value = currentAccount.phoneNumber || '';
+      document.getElementById('vehicleColor').value = currentAccount.preferredVehicleColor || '';
+      document.getElementById('vehicleMake').value = currentAccount.preferredVehicleMake || '';
+      document.getElementById('vehicleModel').value = currentAccount.preferredVehicleModel || '';
+      document.getElementById('streetAddress').value = currentAccount.streetAddress || '';
+      document.getElementById('city').value = currentAccount.city || '';
+      document.getElementById('state').value = currentAccount.state || '';
+      document.getElementById('zipCode').value = currentAccount.zipCode || '';
+    }
+
+    async function handleWashRequest(event) {
+      event.preventDefault();
+
+      if (!currentAccount || !sessionToken) {
+        requestStatus.textContent = 'Please log in again.';
+        requestStatus.style.color = 'var(--red)';
+        return;
+      }
+
+      if (Number(currentAccount.washesRemaining || 0) <= 0) {
+        requestStatus.textContent = 'You do not have any washes remaining.';
+        requestStatus.style.color = 'var(--red)';
+        return;
+      }
+
+      const selectedService = document.querySelector('input[name="serviceType"]:checked');
+
+      if (!selectedService) {
+        requestStatus.textContent = 'Please choose a service type.';
+        requestStatus.style.color = 'var(--red)';
+        return;
+      }
+
+      requestButton.disabled = true;
+      requestStatus.textContent = 'Submitting request...';
+      requestStatus.style.color = 'var(--blue)';
+
+      try {
+        const payload = {
+          sessionToken: sessionToken,
+          serviceType: selectedService.value,
+          phoneNumber: document.getElementById('requestPhone').value,
+          vehicleColor: document.getElementById('vehicleColor').value,
+          vehicleMake: document.getElementById('vehicleMake').value,
+          vehicleModel: document.getElementById('vehicleModel').value,
+          streetAddress: document.getElementById('streetAddress').value,
+          city: document.getElementById('city').value,
+          state: document.getElementById('state').value,
+          zipCode: document.getElementById('zipCode').value,
+          appointmentDate: appointmentDate.value,
+          appointmentTime: appointmentTime.value,
+          notes: document.getElementById('requestNotes').value
+        };
+
+        const response = await callApi('requestWash', payload);
+
+        if (!response.ok) {
+          requestStatus.textContent = response.message || 'Could not submit request.';
+          requestStatus.style.color = 'var(--red)';
+          updateDashboardText();
+          return;
+        }
+
+        currentAccount = response.account;
+        updateDashboardText();
+
+        confirmationMessage.textContent =
+          'Confirmation Number: ' + response.request.confirmationNumber + '\n' +
+          'Service: ' + response.request.serviceType + '\n' +
+          'Date: ' + response.request.appointmentDate + '\n' +
+          'Time: ' + response.request.appointmentTime + '\n' +
+          'Washes Remaining: ' + response.account.washesRemaining;
+
+        confirmationModal.classList.add('show');
+
+        washRequestForm.reset();
+        setMinimumAppointmentDate();
+        buildTimeOptions();
+        prefillRequestForm();
+
+        requestStatus.textContent = 'Request submitted successfully.';
+        requestStatus.style.color = 'var(--green)';
+      } catch (error) {
+        requestStatus.textContent = error.message || 'Server error.';
+        requestStatus.style.color = 'var(--red)';
+      } finally {
+        updateDashboardText();
+      }
+    }
+
+    function logout() {
+      if (sessionToken) {
+        callApi('logout', { sessionToken: sessionToken }).catch(function () {});
+      }
+
+      sessionToken = '';
+      currentAccount = null;
+
+      dashboardScreen.classList.add('hidden');
+      authScreen.classList.remove('hidden');
+
+      showAuthForm('login');
+    }
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+    }
+
+    function closeSidebarNow() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+
+    function getLocalDateValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    function setMinimumAppointmentDate() {
+      appointmentDate.min = getLocalDateValue(new Date());
+    }
+
+    function getMinimumAllowedMinutesForDate(selectedDate) {
+      const todayValue = getLocalDateValue(new Date());
+
+      if (selectedDate !== todayValue) {
+        return null;
+      }
+
+      const now = new Date();
+      const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+      const minutes = oneHourFromNow.getHours() * 60 + oneHourFromNow.getMinutes();
+
+      return Math.ceil(minutes / 15) * 15;
+    }
+
+    function buildTimeOptions() {
+      setMinimumAppointmentDate();
+
+      const options = ['<option value="">Select a time</option>'];
+      const startMinutes = 8 * 60;
+      const endMinutes = 20 * 60;
+      const minimumAllowedMinutes = getMinimumAllowedMinutesForDate(appointmentDate.value);
+
+      for (let totalMinutes = startMinutes; totalMinutes <= endMinutes; totalMinutes += 15) {
+        if (minimumAllowedMinutes !== null && totalMinutes < minimumAllowedMinutes) {
+          continue;
+        }
+
+        const hour = Math.floor(totalMinutes / 60);
+        const minute = totalMinutes % 60;
+
+        const value = String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
+
+        const date = new Date();
+        date.setHours(hour, minute, 0, 0);
+
+        const label = date.toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: '2-digit'
+        });
+
+        options.push('<option value="' + value + '">' + label + '</option>');
+      }
+
+      if (options.length === 1) {
+        options.push('<option value="" disabled>No times available today</option>');
+      }
+
+      appointmentTime.innerHTML = options.join('');
+    }
+
+    menuToggle.addEventListener('click', function () {
+      if (sidebar.classList.contains('open')) {
+        closeSidebarNow();
+      } else {
+        openSidebar();
+      }
+    });
+
+    overlay.addEventListener('click', closeSidebarNow);
+
+    document.querySelectorAll('.sidebar a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        if (window.innerWidth <= 920) {
+          closeSidebarNow();
+        }
+      });
+    });
+
+    appointmentDate.addEventListener('change', buildTimeOptions);
+
+    closeConfirmation.addEventListener('click', function () {
+      confirmationModal.classList.remove('show');
+    });
+
+    doneConfirmation.addEventListener('click', function () {
+      confirmationModal.classList.remove('show');
+    });
+
+    confirmationOverlay.addEventListener('click', function () {
+      confirmationModal.classList.remove('show');
+    });
+  </script>
+</body>
+</html>
