@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>SigmaWash Tracker</title>
 
   <style>
@@ -273,6 +274,11 @@
       color: white;
     }
 
+    .primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
     .secondary {
       flex: 1;
       background: #e5e7eb;
@@ -480,7 +486,7 @@
         <label for="confirmationInput">Confirmation Number</label>
 
         <div class="lookup-row">
-          <input id="confirmationInput" placeholder="Example: SW12345" autocomplete="off" />
+          <input id="confirmationInput" placeholder="Example: SIG-123456" autocomplete="off" />
           <button class="primary" id="lookupButton" onclick="lookupAppointment()">Track</button>
         </div>
 
@@ -577,7 +583,9 @@
     ];
 
     confirmationInput.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") lookupAppointment();
+      if (event.key === "Enter") {
+        lookupAppointment();
+      }
     });
 
     async function lookupAppointment() {
@@ -609,7 +617,7 @@
         startLiveTracking();
       } catch (error) {
         console.error(error);
-        showError("Could not load appointment data. Make sure your Google Apps Script returns JSON and is deployed for public access.");
+        showError(error.message || "Could not load appointment data.");
       } finally {
         lookupButton.textContent = "Track";
         lookupButton.disabled = false;
@@ -627,68 +635,47 @@
     }
 
     async function getAppointmentByConfirmation(confirmation) {
-      const data = await loadSheetDataWithJsonp(confirmation);
+      const data = await loadSheetData(confirmation);
       return normalizeAppointmentResponse(data, confirmation);
     }
 
-    function loadSheetDataWithJsonp(confirmation) {
-      return new Promise(function(resolve, reject) {
-        const callbackName = "sigmawashCallback_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
-        const script = document.createElement("script");
-        const separator = SHEET_API_URL.includes("?") ? "&" : "?";
-        let didFinish = false;
+    async function loadSheetData(confirmation) {
+      const separator = SHEET_API_URL.includes("?") ? "&" : "?";
 
-        window[callbackName] = function(data) {
-          didFinish = true;
-          cleanup();
-          resolve(data);
-        };
+      const url =
+        SHEET_API_URL +
+        separator +
+        "action=getAppointment" +
+        "&confirmation=" +
+        encodeURIComponent(confirmation) +
+        "&t=" +
+        Date.now();
 
-        script.onerror = function() {
-          if (didFinish) return;
-          didFinish = true;
-          cleanup();
-          reject(new Error("Could not load Google Sheet data."));
-        };
-
-        const timer = setTimeout(function() {
-          if (didFinish) return;
-          didFinish = true;
-          cleanup();
-          reject(new Error("Google Sheet data request timed out."));
-        }, 12000);
-
-        function cleanup() {
-          clearTimeout(timer);
-
-          if (script.parentNode) {
-            script.parentNode.removeChild(script);
-          }
-
-          try {
-            delete window[callbackName];
-          } catch (error) {
-            window[callbackName] = undefined;
-          }
-        }
-
-        script.src =
-          SHEET_API_URL +
-          separator +
-          "action=getAppointment" +
-          "&callback=" +
-          encodeURIComponent(callbackName) +
-          "&confirmation=" +
-          encodeURIComponent(confirmation) +
-          "&t=" +
-          Date.now();
-
-        document.body.appendChild(script);
+      const response = await fetch(url, {
+        method: "GET",
+        cache: "no-store"
       });
+
+      const text = await response.text();
+
+      if (!response.ok) {
+        throw new Error("Tracker API error " + response.status + ": " + text.slice(0, 300));
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        throw new Error("Tracker API returned non-JSON: " + text.slice(0, 300));
+      }
     }
 
     function normalizeAppointmentResponse(data, confirmation) {
       if (!data) return null;
+
+      if (data.ok === false) {
+        throw new Error(data.message || "Tracker API returned an error.");
+      }
+
       if (data.found === false) return null;
       if (data.appointment) return data.appointment;
       if (data.row) return data.row;
@@ -698,6 +685,7 @@
       return rows.find(function(row) {
         const rowConfirmation = getValue(row, [
           "Confirmation Number",
+          "confirmationNumber",
           "Confirmation",
           "Confirm Number",
           "Order Number"
@@ -764,15 +752,7 @@
       eta.textContent = status.minutesLeft;
       etaLabel.textContent = status.etaLabel;
       currentStep.textContent = status.stepName;
-
-      /*
-        FIXED:
-        This displays Appointment Date + Appointment Time from Google Sheets.
-        It does NOT display the form Timestamp.
-        It also avoids the one-day timezone shift.
-      */
       appointmentTime.textContent = formatAppointmentDisplay(selectedRow);
-
       progressBar.style.width = status.progressPercent + "%";
 
       moveVan(status.mapProgress, status.stageIndex);
@@ -991,14 +971,16 @@
         "Appointment Date",
         "Date",
         "Appt Date",
-        "Service Date"
+        "Service Date",
+        "appointmentDate"
       ]);
 
       const timeValue = getValue(row, [
         "Appointment Time",
         "Time",
         "Appt Time",
-        "Service Time"
+        "Service Time",
+        "appointmentTime"
       ]);
 
       const dateOnly = parseDateOnlyValue(dateValue);
@@ -1035,14 +1017,16 @@
         "Appointment Date",
         "Date",
         "Appt Date",
-        "Service Date"
+        "Service Date",
+        "appointmentDate"
       ]);
 
       const timeValue = getValue(row, [
         "Appointment Time",
         "Time",
         "Appt Time",
-        "Service Time"
+        "Service Time",
+        "appointmentTime"
       ]);
 
       const dateOnly = parseDateOnlyValue(dateValue);
@@ -1090,7 +1074,6 @@
 
       if (!text) return null;
 
-      // Handles "2026-04-28" or "2026-04-28T00:00:00.000Z"
       const isoMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
 
       if (isoMatch) {
@@ -1101,8 +1084,6 @@
         );
       }
 
-      // Handles "4/28/2026", "04/28/2026", "4/28/26",
-      // and also "4/28/2026 12:00:00 AM"
       const slashMatch = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:\s+.*)?$/);
 
       if (slashMatch) {
@@ -1119,7 +1100,6 @@
         );
       }
 
-      // Handles "Apr 28, 2026" or "April 28, 2026"
       const monthTextMatch = text.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
 
       if (monthTextMatch) {
@@ -1473,19 +1453,6 @@
       const ratio = clamp((now - start) / Math.max(1, end - start), 0, 1);
 
       return outputMin + (outputMax - outputMin) * ratio;
-    }
-
-    function formatDateTime(date) {
-      if (!date || isNaN(date)) {
-        return "Not listed";
-      }
-
-      return date.toLocaleString([], {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit"
-      });
     }
 
     function showError(message) {
