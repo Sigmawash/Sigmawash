@@ -905,14 +905,11 @@
       IMPORTANT:
       This must be your Cloudflare Worker URL, not your Google Apps Script URL.
 
-      Required backend behavior for this phone-only version:
-      1. action: "lookupAccount"
-         data: { phoneNumber }
-         returns: { ok: true, account: { phoneNumber, washesRemaining, ...saved order fields } }
+      Same Cloudflare Worker link as before.
 
-      2. action: "requestWash"
-         This page sends the same order information as before, but without requiring login/password.
-         The backend should find the customer by phoneNumber and create the same order/confirmation as before.
+      The Google Apps Script behind this Worker must include action "lookupAccount".
+      The patch file I provided adds that action and also lets "requestWash" work with
+      phoneNumber instead of sessionToken.
     */
     const API_URL = 'https://sigmawash-booking.quantitativemidwest.workers.dev/sub';
 
