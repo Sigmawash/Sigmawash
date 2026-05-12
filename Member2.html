@@ -550,6 +550,17 @@
       transform: translateY(-1px);
     }
 
+    .service-hidden {
+      display: none !important;
+    }
+
+    .service-type-notice {
+      margin-top: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
     .actions {
       display: flex;
       align-items: center;
@@ -746,7 +757,6 @@
       <div class="sidebar-group">
         <div class="sidebar-label">Menu</div>
         <nav class="sidebar-nav">
-          <a href="#overview">Overview</a>
           <a href="#request">Request Car Wash</a>
           <button type="button" onclick="useDifferentPhone()">Use different phone</button>
         </nav>
@@ -769,7 +779,6 @@
           </div>
 
           <nav class="menu" aria-label="Top navigation">
-            <a href="#overview">Overview</a>
             <a href="#request">Request</a>
             <button type="button" onclick="useDifferentPhone()">Different phone</button>
           </nav>
@@ -779,44 +788,14 @@
       <div class="page">
         <section class="hero">
           <div class="hero-copy">
-            <div class="eyebrow">Wash balance</div>
-            <h1>Your car washes</h1>
+            <div class="eyebrow">Ready to order</div>
+            <h1>Request your car wash</h1>
             <p id="heroMessage">
               Your wash balance is connected to the phone number entered.
             </p>
           </div>
         </section>
 
-        <section class="glass-card" id="overview">
-          <h2>Account Overview</h2>
-          <p class="subtext">
-            Only the phone number and available wash balance are shown to the customer.
-          </p>
-
-          <div class="balance-message" id="balanceMessage">
-            You have 0 car washes left.
-          </div>
-
-          <div class="info-grid">
-            <div class="mini-card">
-              <h3>Washes Remaining</h3>
-              <div class="metric" id="washesRemaining">0</div>
-              <p>One wash is used when a request is submitted.</p>
-            </div>
-
-            <div class="mini-card">
-              <h3>Phone Number</h3>
-              <span class="badge" id="accountPhone">—</span>
-              <p style="margin-top: 12px;">This is the number used for lookup.</p>
-            </div>
-
-            <div class="mini-card">
-              <h3>Confirmation</h3>
-              <div class="metric" id="lastConfirmation">—</div>
-              <p>The confirmation number appears after ordering.</p>
-            </div>
-          </div>
-        </section>
 
         <section class="glass-card" id="request">
           <h2>Request a Car Wash</h2>
@@ -824,13 +803,17 @@
             Choose the service and appointment time. The order is sent to the same ordering system with the phone number and saved account details behind the scenes.
           </p>
 
+          <div class="balance-message" id="balanceMessage">
+            You have 0 car washes left.
+          </div>
+
           <form id="washRequestForm" onsubmit="handleWashRequest(event)">
             <div class="form-grid">
               <div class="field full">
                 <label>Service Type</label>
 
-                <div class="radio-group">
-                  <label class="radio-card">
+                <div class="radio-group" id="serviceTypeGroup">
+                  <label class="radio-card" data-service="Exterior Fresh">
                     <input type="radio" name="serviceType" value="Exterior Fresh" required />
                     <span>
                       Exterior Fresh
@@ -838,7 +821,7 @@
                     </span>
                   </label>
 
-                  <label class="radio-card">
+                  <label class="radio-card" data-service="Interior Fresh">
                     <input type="radio" name="serviceType" value="Interior Fresh" required />
                     <span>
                       Interior Fresh
@@ -846,7 +829,7 @@
                     </span>
                   </label>
 
-                  <label class="radio-card">
+                  <label class="radio-card" data-service="Total Fresh">
                     <input type="radio" name="serviceType" value="Total Fresh" required />
                     <span>
                       Total Fresh
@@ -854,6 +837,8 @@
                     </span>
                   </label>
                 </div>
+
+                <div class="service-type-notice" id="serviceTypeNotice"></div>
               </div>
 
               <div class="field">
@@ -905,11 +890,14 @@
       IMPORTANT:
       This must be your Cloudflare Worker URL, not your Google Apps Script URL.
 
-      Same Cloudflare Worker link as before.
+      Required backend behavior for this phone-only version:
+      1. action: "lookupAccount"
+         data: { phoneNumber }
+         returns: { ok: true, account: { phoneNumber, washesRemaining, subscriptionType, ...saved order fields } }
 
-      The Google Apps Script behind this Worker must include action "lookupAccount".
-      The patch file I provided adds that action and also lets "requestWash" work with
-      phoneNumber instead of sessionToken.
+      2. action: "requestWash"
+         This page sends the same order information as before, but without requiring login/password.
+         The backend should find the customer by phoneNumber and create the same order/confirmation as before.
     */
     const API_URL = 'https://sigmawash-booking.quantitativemidwest.workers.dev/sub';
 
@@ -929,9 +917,7 @@
     const sidebarPhone = document.getElementById('sidebarPhone');
     const heroMessage = document.getElementById('heroMessage');
     const balanceMessage = document.getElementById('balanceMessage');
-    const washesRemaining = document.getElementById('washesRemaining');
-    const accountPhone = document.getElementById('accountPhone');
-    const lastConfirmation = document.getElementById('lastConfirmation');
+    const serviceTypeNotice = document.getElementById('serviceTypeNotice');
 
     const washRequestForm = document.getElementById('washRequestForm');
     const requestButton = document.getElementById('requestButton');
@@ -1015,7 +1001,8 @@
 
         currentAccount = response.account || {
           phoneNumber: phoneNumber,
-          washesRemaining: response.washesRemaining || 0
+          washesRemaining: response.washesRemaining || 0,
+          subscriptionType: response.subscriptionType || ''
         };
 
         if (!currentAccount.phoneNumber) {
@@ -1040,22 +1027,79 @@
       updateDashboardText();
     }
 
+    function getAllowedServiceFromSubscription(account) {
+      const rawType = String(
+        account?.subscriptionType ||
+        account?.subscription ||
+        account?.plan ||
+        ''
+      ).trim();
+
+      const normalized = rawType.toLowerCase();
+
+      if (/\btotal\b/.test(normalized)) {
+        return { value: 'Total Fresh', label: 'Total Fresh', subscriptionType: rawType };
+      }
+
+      if (/\binterior\b/.test(normalized)) {
+        return { value: 'Interior Fresh', label: 'Interior Fresh', subscriptionType: rawType };
+      }
+
+      if (/\bexterior\b/.test(normalized)) {
+        return { value: 'Exterior Fresh', label: 'Exterior Fresh', subscriptionType: rawType };
+      }
+
+      return { value: '', label: '', subscriptionType: rawType };
+    }
+
+    function applySubscriptionServiceRules() {
+      const allowedService = getAllowedServiceFromSubscription(currentAccount);
+      const serviceCards = document.querySelectorAll('.radio-card[data-service]');
+      let foundAllowedService = false;
+
+      serviceCards.forEach(function (card) {
+        const input = card.querySelector('input[name="serviceType"]');
+        const isAllowed = input && input.value === allowedService.value;
+
+        card.classList.toggle('service-hidden', !isAllowed);
+        input.disabled = !isAllowed;
+        input.checked = isAllowed;
+
+        if (isAllowed) {
+          foundAllowedService = true;
+        }
+      });
+
+      if (foundAllowedService) {
+        serviceTypeNotice.textContent = 'Your subscription allows ' + allowedService.label + ' orders.';
+        serviceTypeNotice.style.color = 'var(--muted)';
+      } else {
+        serviceTypeNotice.textContent = 'We could not match your subscription type to Exterior, Interior, or Total Fresh. Please contact Sigma Wash.';
+        serviceTypeNotice.style.color = 'var(--red)';
+      }
+
+      return foundAllowedService;
+    }
+
     function updateDashboardText() {
       if (!currentAccount) return;
 
       const phone = currentAccount.phoneNumber || lastLookupPhone || '—';
       const washes = Number(currentAccount.washesRemaining || 0);
       const washWord = washes === 1 ? 'wash' : 'washes';
+      const hasAllowedService = applySubscriptionServiceRules();
 
       sidebarPhone.textContent = phone;
       heroMessage.textContent = 'Phone number: ' + phone;
       balanceMessage.textContent = 'You have ' + washes + ' car ' + washWord + ' left.';
-      washesRemaining.textContent = washes;
-      accountPhone.textContent = phone;
 
       if (washes <= 0) {
         requestButton.disabled = true;
         requestStatus.textContent = 'You do not have any washes remaining. Please contact Sigma Wash to renew or add washes.';
+        requestStatus.style.color = 'var(--red)';
+      } else if (!hasAllowedService) {
+        requestButton.disabled = true;
+        requestStatus.textContent = 'Subscription type is missing or unsupported.';
         requestStatus.style.color = 'var(--red)';
       } else {
         requestButton.disabled = false;
@@ -1088,11 +1132,19 @@
         return;
       }
 
+      const allowedService = getAllowedServiceFromSubscription(currentAccount);
       const selectedService = document.querySelector('input[name="serviceType"]:checked');
 
-      if (!selectedService) {
-        requestStatus.textContent = 'Please choose a service type.';
+      if (!allowedService.value) {
+        requestStatus.textContent = 'Subscription type is missing or unsupported.';
         requestStatus.style.color = 'var(--red)';
+        return;
+      }
+
+      if (!selectedService || selectedService.value !== allowedService.value) {
+        requestStatus.textContent = 'This subscription only allows ' + allowedService.label + ' orders.';
+        requestStatus.style.color = 'var(--red)';
+        applySubscriptionServiceRules();
         return;
       }
 
@@ -1105,6 +1157,7 @@
           phoneNumber: currentAccount.phoneNumber || lastLookupPhone,
           phoneDigits: normalizePhone(currentAccount.phoneNumber || lastLookupPhone),
           serviceType: selectedService.value,
+          subscriptionType: currentAccount.subscriptionType || '',
 
           // These fields keep the order payload compatible with the old ordering system.
           // They are not shown on the page, but they can still come from the account lookup response.
@@ -1137,7 +1190,11 @@
           '—';
 
         if (response.account) {
+          const previousAccount = currentAccount || {};
           currentAccount = response.account;
+          if (!currentAccount.subscriptionType) {
+            currentAccount.subscriptionType = previousAccount.subscriptionType || '';
+          }
         } else if (typeof response.washesRemaining !== 'undefined') {
           currentAccount.washesRemaining = response.washesRemaining;
         } else {
@@ -1148,7 +1205,6 @@
           currentAccount.phoneNumber = payload.phoneNumber;
         }
 
-        lastConfirmation.textContent = confirmationNumber;
         updateDashboardText();
 
         confirmationMessage.textContent =
