@@ -990,7 +990,10 @@
       try {
         const response = await callApi('lookupAccount', {
           phoneNumber: phoneNumber,
-          phoneDigits: phoneDigits
+          phoneDigits: phoneDigits,
+          source: 'phone_lookup_page',
+          pageUrl: window.location.href,
+          userAgent: navigator.userAgent
         });
 
         if (!response.ok) {
