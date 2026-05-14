@@ -41,7 +41,7 @@
     .top-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
     }
 
@@ -65,17 +65,13 @@
       font-weight: bold;
     }
 
-    .back-button {
+    .back-link {
       display: inline-block;
-      margin-top: 14px;
-      border: 1px solid rgba(255,255,255,.45);
-      background: rgba(255,255,255,.16);
+      margin-top: 12px;
       color: white;
-      padding: 10px 14px;
-      border-radius: 999px;
       font-size: 14px;
       font-weight: bold;
-      cursor: pointer;
+      text-decoration: none;
     }
 
     .map {
@@ -255,6 +251,7 @@
       padding: 13px 14px;
       font-size: 15px;
       outline: none;
+      text-transform: uppercase;
     }
 
     input:focus {
@@ -453,19 +450,6 @@
       .map {
         height: 280px;
       }
-
-      .lookup-row {
-        flex-direction: column;
-      }
-
-      .status {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .eta {
-        width: 100%;
-      }
     }
   </style>
 </head>
@@ -476,8 +460,8 @@
       <div class="top-row">
         <div>
           <h1>SigmaWash Tracker</h1>
-          <p>Enter your phone number to see your mobile car wash progress.</p>
-          <button type="button" class="back-button" onclick="window.location.href='/'">← Go Back</button>
+          <p>Enter your confirmation number to see your mobile car wash progress.</p>
+          <button onclick="window.location.href='/'">Go Back</button>
         </div>
 
         <div class="badge">SIGMA</div>
@@ -499,20 +483,14 @@
 
     <section class="card">
       <div class="lookup">
-        <label for="phoneInput">Phone Number</label>
+        <label for="confirmationInput">Confirmation Number</label>
 
         <div class="lookup-row">
-          <input
-            id="phoneInput"
-            type="tel"
-            inputmode="tel"
-            placeholder="Example: 555-123-4567"
-            autocomplete="tel"
-          />
-          <button type="button" class="primary" id="lookupButton" onclick="lookupAppointment()">Track</button>
+          <input id="confirmationInput" placeholder="Example: SIG-123456" autocomplete="off" />
+          <button class="primary" id="lookupButton" onclick="lookupAppointment()">Track</button>
         </div>
 
-        <p class="note">Enter the same phone number used when booking your SigmaWash appointment.</p>
+        <p class="note">Only the confirmation number is used to find your appointment.</p>
       </div>
 
       <div class="message error" id="errorBox"></div>
@@ -520,7 +498,7 @@
 
       <div class="status">
         <div>
-          <h2 id="statusTitle">Enter phone number</h2>
+          <h2 id="statusTitle">Enter confirmation number</h2>
           <p id="statusMessage">Your wash progress will appear here after we find your appointment.</p>
         </div>
 
@@ -554,8 +532,8 @@
       </ul>
 
       <div class="controls">
-        <button type="button" class="ghost" onclick="refreshCurrentAppointment()">Refresh</button>
-        <button type="button" class="secondary" onclick="resetTracker()">Reset</button>
+        <button class="ghost" onclick="refreshCurrentAppointment()">Refresh</button>
+        <button class="secondary" onclick="resetTracker()">Reset</button>
       </div>
     </section>
   </main>
@@ -568,11 +546,11 @@
     const DEFAULT_WASHING_MINUTES = 30;
 
     let selectedRow = null;
-    let selectedPhone = "";
+    let selectedConfirmation = "";
     let refreshTimer = null;
     let countdownTimer = null;
 
-    const phoneInput = document.getElementById("phoneInput");
+    const confirmationInput = document.getElementById("confirmationInput");
     const lookupButton = document.getElementById("lookupButton");
     const statusTitle = document.getElementById("statusTitle");
     const statusMessage = document.getElementById("statusMessage");
@@ -604,39 +582,33 @@
       { left: 306, top: 208 }
     ];
 
-    phoneInput.addEventListener("keydown", function(event) {
+    confirmationInput.addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
         lookupAppointment();
       }
     });
 
     async function lookupAppointment() {
-      const phone = phoneInput.value.trim();
-      const phoneDigits = normalizePhone(phone);
+      const confirmation = confirmationInput.value.trim().toUpperCase();
 
-      if (!phoneDigits) {
-        showError("Please enter your phone number.");
+      if (!confirmation) {
+        showError("Please enter your confirmation number.");
         return;
       }
 
-      if (phoneDigits.length < 7) {
-        showError("Please enter a valid phone number.");
-        return;
-      }
-
-      selectedPhone = phone;
+      selectedConfirmation = confirmation;
       lookupButton.textContent = "Checking...";
       lookupButton.disabled = true;
       hideMessages();
 
       try {
-        const match = await getAppointmentByPhone(phone);
+        const match = await getAppointmentByConfirmation(confirmation);
 
         if (!match) {
           selectedRow = null;
           stopTimers();
           resetVisuals();
-          showError("No SigmaWash appointment was found for that phone number.");
+          showError("No SigmaWash appointment was found for that confirmation number.");
           return;
         }
 
@@ -653,30 +625,29 @@
     }
 
     async function refreshCurrentAppointment() {
-      if (!selectedPhone) {
-        showError("Enter your phone number first.");
+      if (!selectedConfirmation) {
+        showError("Enter your confirmation number first.");
         return;
       }
 
-      phoneInput.value = selectedPhone;
+      confirmationInput.value = selectedConfirmation;
       await lookupAppointment();
     }
 
-    async function getAppointmentByPhone(phone) {
-      const data = await loadSheetData(phone);
-      return normalizeAppointmentResponse(data, phone);
+    async function getAppointmentByConfirmation(confirmation) {
+      const data = await loadSheetData(confirmation);
+      return normalizeAppointmentResponse(data, confirmation);
     }
 
-    async function loadSheetData(phone) {
+    async function loadSheetData(confirmation) {
       const separator = SHEET_API_URL.includes("?") ? "&" : "?";
-      const phoneDigits = normalizePhone(phone);
 
       const url =
         SHEET_API_URL +
         separator +
         "action=getAppointment" +
-        "&phone=" +
-        encodeURIComponent(phoneDigits) +
+        "&confirmation=" +
+        encodeURIComponent(confirmation) +
         "&t=" +
         Date.now();
 
@@ -698,7 +669,7 @@
       }
     }
 
-    function normalizeAppointmentResponse(data, phone) {
+    function normalizeAppointmentResponse(data, confirmation) {
       if (!data) return null;
 
       if (data.ok === false) {
@@ -712,20 +683,15 @@
       const rows = normalizeRows(data);
 
       return rows.find(function(row) {
-        const rowPhone = getValue(row, [
-          "Phone Number",
-          "Phone",
-          "Customer Phone",
-          "Mobile",
-          "Mobile Number",
-          "Cell Phone",
-          "Telephone",
-          "Contact Phone",
-          "phoneNumber",
-          "customerPhone"
+        const rowConfirmation = getValue(row, [
+          "Confirmation Number",
+          "confirmationNumber",
+          "Confirmation",
+          "Confirm Number",
+          "Order Number"
         ]);
 
-        return phonesMatch(rowPhone, phone);
+        return normalizeText(rowConfirmation) === normalizeText(confirmation);
       }) || null;
     }
 
@@ -760,10 +726,10 @@
       countdownTimer = setInterval(updateFromSelectedRow, 1000);
 
       refreshTimer = setInterval(async function() {
-        if (!selectedPhone) return;
+        if (!selectedConfirmation) return;
 
         try {
-          const match = await getAppointmentByPhone(selectedPhone);
+          const match = await getAppointmentByConfirmation(selectedConfirmation);
 
           if (match) {
             selectedRow = match;
@@ -1017,25 +983,6 @@
         progressPercent: Math.round(progress * 100),
         mapProgress: mapProgress
       };
-    }
-
-    function normalizePhone(value) {
-      return String(value || "").replace(/\D/g, "");
-    }
-
-    function phonesMatch(rowPhone, userPhone) {
-      const rowDigits = normalizePhone(rowPhone);
-      const userDigits = normalizePhone(userPhone);
-
-      if (!rowDigits || !userDigits) return false;
-
-      if (rowDigits === userDigits) return true;
-
-      if (rowDigits.length >= 10 && userDigits.length >= 10) {
-        return rowDigits.slice(-10) === userDigits.slice(-10);
-      }
-
-      return false;
     }
 
     function hasDoneValue(value) {
@@ -1405,6 +1352,19 @@
       return output;
     }
 
+    function normalizeText(value) {
+      const text = String(value || "").trim().toUpperCase();
+      let output = "";
+
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] !== " ") {
+          output += text[i];
+        }
+      }
+
+      return output;
+    }
+
     function isSimpleNumber(text) {
       if (!text) return false;
 
@@ -1532,8 +1492,8 @@
 
     function resetTracker() {
       selectedRow = null;
-      selectedPhone = "";
-      phoneInput.value = "";
+      selectedConfirmation = "";
+      confirmationInput.value = "";
 
       stopTimers();
       hideMessages();
@@ -1541,7 +1501,7 @@
     }
 
     function resetVisuals() {
-      statusTitle.textContent = "Enter phone number";
+      statusTitle.textContent = "Enter confirmation number";
       statusMessage.textContent = "Your wash progress will appear here after we find your appointment.";
       eta.textContent = "--";
       etaLabel.textContent = "min left";
