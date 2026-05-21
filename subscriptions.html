@@ -766,6 +766,101 @@
         width: 100%;
       }
     }
+
+:root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #86868b;
+      --border: #d2d2d7;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+    }
+
+    .chart-wrap {
+      width: min(920px, calc(100% - 32px));
+      padding: 34px;
+      background: var(--card);
+      border: 1px solid rgba(210, 210, 215, 0.65);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-title {
+      margin: 0 0 20px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+      font-weight: 700;
+    }
+
+    .chart-subtitle {
+      margin: -10px 0 28px;
+      font-size: 17px;
+      line-height: 1.45;
+      color: var(--muted);
+      letter-spacing: -0.01em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: #fff;
+    }
+
+    td {
+      height: 86px;
+      padding: 22px 24px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      vertical-align: middle;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    td:last-child {
+      border-right: none;
+    }
+
+    td:empty::after {
+      content: "\00a0";
+    }
+
+    @media (max-width: 640px) {
+      .chart-wrap {
+        padding: 22px;
+        border-radius: 22px;
+      }
+
+      td {
+        height: 72px;
+        padding: 16px;
+      }
+    }
+    
   </style>
 </head>
 <body>
@@ -964,7 +1059,37 @@
       </div>
     </main>
   </div>
+  
+  <main class="chart-wrap" aria-label="Blank three column four row chart">
+    <h1 class="chart-title">Chart Title</h1>
+    <p class="chart-subtitle">Optional subtitle or description.</p>
 
+    <table aria-label="Blank chart with three columns and four rows">
+      <tbody>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+  
   <script>
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
