@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sigma Wash Service Selection</title>
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --panel: #ffffff;
+      --panel-soft: #fbfbfd;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: #e5e5e7;
+      --blue: #0071e3;
+      --blue-hover: #0077ed;
+      --sidebar-width: 290px;
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+      --max-width: 1280px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--line);
+      padding: 28px 20px 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-brand {
+      padding: 8px 10px 22px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+
+    .sidebar-copy {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.96rem;
+      padding: 0 10px;
+      margin-bottom: 22px;
+    }
+
+    .sidebar-group {
+      margin-bottom: 22px;
+    }
+
+    .sidebar-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .sidebar-nav a {
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 0.98rem;
+      color: var(--text);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .sidebar-nav a:hover {
+      background: #f0f3f6;
+      color: var(--blue);
+      transform: translateX(2px);
+    }
+
+    .sidebar-card {
+      margin-top: 26px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7f7fa 100%);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .sidebar-card a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: rgba(245, 245, 247, 0.82);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .topbar-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .menu-toggle {
+      display: none;
+      border: 0;
+      background: #000;
+      color: #fff;
+      border-radius: 999px;
+      width: 42px;
+      height: 42px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .brand-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .top-logo {
+      height: 88px;
+      width: auto;
+      display: block;
+    }
+
+    .sidebar-logo {
+      display: block;
+      width: 100%;
+      max-width: 220px;
+      height: auto;
+      margin: 0 auto 14px;
+    }
+
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: flex-end;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 500;
+    }
+
+    .menu a:hover {
+      color: var(--text);
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 34px 28px 46px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 28px;
+      padding: 34px 0 40px;
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.7rem, 6vw, 5.25rem);
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+      font-weight: 700;
+      max-width: 9ch;
+    }
+
+    .hero-copy p {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.65;
+      max-width: 44ch;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .hero-links a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    .hero-links a:hover {
+      color: var(--blue-hover);
+    }
+
+    .glass-card {
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .glass-card h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      letter-spacing: -0.04em;
+    }
+
+    .glass-card .subtext {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 54ch;
+    }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      appearance: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: rgba(0, 113, 227, 0.55);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .radio-group {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .radio-card {
+      position: relative;
+      display: block;
+      cursor: pointer;
+    }
+
+    .radio-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-card span {
+      display: block;
+      position: relative;
+      border: 1px solid #d9d9de;
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 16px 18px;
+      min-height: 124px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .radio-price {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0071e3;
+    }
+
+    .radio-card small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .radio-card input:checked + span {
+      border-color: rgba(0, 113, 227, 0.6);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.12);
+      background: #f5f9ff;
+      transform: translateY(-1px);
+    }
+
+    .button,
+    .secondary-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .button {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .button:hover {
+      background: var(--blue-hover);
+      transform: translateY(-1px);
+    }
+
+    .secondary-button {
+      background: #f2f2f5;
+      color: var(--text);
+    }
+
+    .secondary-button:hover {
+      background: #e9e9ee;
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      background: #bfc7d1;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.85;
+    }
+
+    .service-grid,
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .mini-card {
+      background: linear-gradient(180deg, #ffffff 0%, #fafafd 100%);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .mini-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+    }
+
+    .mini-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .overlay {
+      display: none;
+    }
+
+    .terms-box {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 14px 16px;
+      background: #fff;
+      border: 1px solid #d9d9de;
+      border-radius: 16px;
+    }
+
+    .terms-box input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      margin-top: 3px;
+      border: 2px solid #0071e3;
+      border-radius: 4px;
+      background: #fff;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      padding: 0;
+    }
+
+    .terms-box input[type="checkbox"]::after {
+      content: "";
+      width: 5px;
+      height: 10px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg) scale(0);
+      transition: transform 0.15s ease;
+      margin-top: -1px;
+    }
+
+    .terms-box input[type="checkbox"]:checked {
+      background: #0071e3;
+      border-color: #0071e3;
+    }
+
+    .terms-box input[type="checkbox"]:checked::after {
+      transform: rotate(45deg) scale(1);
+    }
+
+    .terms-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #6e6e73;
+    }
+
+    .terms-link {
+      color: #0071e3;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+    }
+
+    .terms-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+    }
+
+    .terms-modal.show {
+      display: block;
+    }
+
+    .terms-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .terms-content {
+      position: relative;
+      width: min(700px, calc(100% - 30px));
+      max-height: 85vh;
+      overflow-y: auto;
+      margin: 5vh auto 0;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .terms-content h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+    }
+
+    .terms-content p,
+    .terms-content li {
+      color: #6e6e73;
+      line-height: 1.6;
+    }
+
+    .close-terms {
+      float: right;
+      border: none;
+      background: #f2f2f5;
+      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .selection-card {
+      scroll-margin-top: 130px;
+    }
+
+    .selection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .selection-header h2 {
+      margin-bottom: 8px;
+    }
+
+    .selection-header .subtext {
+      margin-bottom: 0;
+    }
+
+    .category-clear {
+      white-space: nowrap;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #f2f2f5;
+      color: var(--text);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .category-clear:hover {
+      background: #e9e9ee;
+      transform: translateY(-1px);
+    }
+
+    .service-slider {
+      overflow-x: auto;
+      padding: 4px 4px 10px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
+
+    .service-slider .radio-card {
+      scroll-snap-align: start;
+    }
+
+    .service-title {
+      display: block;
+      padding-right: 78px;
+    }
+
+    .summary-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-empty {
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed #d9d9de;
+      border-radius: 18px;
+      padding: 18px;
+      line-height: 1.6;
+    }
+
+    .summary-item {
+      background: #fff;
+      border: 1px solid #d9d9de;
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .summary-item strong {
+      display: block;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .summary-item small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .summary-price {
+      color: var(--blue);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .total-card {
+      position: sticky;
+      top: 136px;
+    }
+
+    .total-label {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .total-price {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: -0.055em;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+
+    .checkout-button {
+      width: 100%;
+      margin-top: 14px;
+    }
+
+    .footer-space {
+      height: 24px;
+    }
+
+    @media (max-width: 1180px) {
+      .service-grid,
+      .info-grid,
+      .radio-group {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .summary-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .total-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        display: none;
+      }
+
+      .top-logo {
+        height: 70px;
+      }
+
+      .overlay.show {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(29, 29, 31, 0.26);
+        z-index: 950;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 18px;
+      }
+
+      .hero h1 {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page,
+      .topbar-inner {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .service-grid,
+      .info-grid,
+      .radio-group {
+        grid-template-columns: 1fr;
+      }
+
+      .glass-card,
+      .mini-card {
+        border-radius: 24px;
+      }
+
+      .selection-header {
+        flex-direction: column;
+      }
+
+      .category-clear {
+        width: 100%;
+      }
+
+      .summary-item {
+        flex-direction: column;
+      }
+
+      .button.checkout-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="transparent-logo.png" alt="Sigma Wash logo" class="sidebar-logo" />
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-label">Explore</div>
+        <nav class="sidebar-nav">
+          <a href="#resources">How It Works</a>
+          <a href="/contact/">Contact Us</a>
+          <a href="/TrackYourOrder/">Track Your Order</a>
+          <a href="Reviews.html">Reviews</a>
+          <a href="/memberorder/">Member Order</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-label">Booking</div>
+        <nav class="sidebar-nav">
+          <a href="#services">Our Offerings</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-card">
+        <strong>Need help ordering?</strong>
+        <a href="#booking">Order Now →</a>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <div class="topbar-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Open sidebar" type="button">☰</button>
+            <a href="#" class="brand-wrap" aria-label="Sigma Wash home">
+              <img src="transparent-logo.png" alt="Sigma Wash logo" class="top-logo" />
+              <div class="brand"></div>
+            </a>
+          </div>
+          <nav class="menu" aria-label="Top navigation">
+            <a href="#services">Packages</a>
+            <a href="/contact/">Contact Us</a>
+            <a href="/TrackYourOrder/">Track Your Order</a>
+            <a href="Reviews.html">Reviews</a>
+            <a href="/memberorder/">Member Order</a>
+            <a href="#booking">Book</a>
+          </nav>
+        </div>
+      </header>
+
+      <div class="page">
+        <section class="hero" id="home">
+          <div class="hero-copy">
+            <div class="eyebrow">Sigma Wash Checkout</div>
+            <h1>Where quality meets affordability</h1>
+            <p>
+              Choose your Exterior Fresh or Interior Fresh plan. Your total updates automatically and checkout routes to the correct Square payment link.
+            </p>
+          </div>
+        </section>
+
+        <section class="glass-card" id="resources">
+          <h2>Choose Your Services</h2>
+          <p class="subtext">
+            Select one option from each category you want. You can choose a single service or create a predefined multi-service checkout.
+          </p>
+
+          <div class="info-grid">
+            <div class="mini-card">
+              <h3>1. Select</h3>
+              <p>Pick one service plan from any section below.</p>
+            </div>
+            <div class="mini-card">
+              <h3>2. Review</h3>
+              <p>Your selected services and total price appear in the summary.</p>
+            </div>
+            <div class="mini-card">
+              <h3>3. Checkout</h3>
+              <p>The page finds the right Square link for your service or predefined combination.</p>
+            </div>
+          </div>
+        </section>
+
+        <div id="services">
+          <div id="serviceSections"></div>
+        </div>
+
+        <section class="glass-card" id="booking">
+          <h2>Price Summary</h2>
+          <p class="subtext">
+            Review your selected services, agree to the Terms & Conditions, then continue to checkout.
+          </p>
+
+          <div class="summary-layout">
+            <div>
+              <div class="summary-list" id="selectedServicesList">
+                <div class="summary-empty">No services selected yet.</div>
+              </div>
+            </div>
+
+            <div class="mini-card total-card" id="termsSection">
+              <div class="total-label">Total Price</div>
+              <div class="total-price" id="totalPrice">$0.00</div>
+
+              <div class="terms-box">
+                <input type="checkbox" id="agreeTerms" />
+                <div class="terms-text">
+                  I agree to the
+                  <button type="button" class="terms-link" id="openTerms">
+                    Terms & Conditions / Service Waiver
+                  </button>
+                </div>
+              </div>
+
+              <button type="button" class="button checkout-button" id="checkoutButton" disabled>
+                Continue to Checkout
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="footer-space"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="terms-modal" id="termsModal">
+    <div class="terms-overlay" id="termsOverlay"></div>
+
+    <div class="terms-content">
+      <button type="button" class="close-terms" id="closeTerms">✕</button>
+
+      <h3>Service Terms & Waiver</h3>
+      <p>By checking this box, you (“Customer”) acknowledge and agree to the following terms:</p>
+
+      <ul>
+        <li>
+          <strong>Property access permission:</strong>
+          You grant Sigma Wash permission to enter and remain on your property at the provided service address for the purpose of performing the requested services.
+        </li>
+        <li>
+          <strong>Payment agreement:</strong>
+          You agree to pay all charges associated with the selected services as described at checkout or as otherwise communicated.
+        </li>
+        <li>
+          <strong>Pre-existing damage disclaimer:</strong>
+          You acknowledge that Sigma Wash is not responsible for any pre-existing damage, defects, loose parts, worn materials, weak paint, cracked glass, or other conditions existing before service begins.
+        </li>
+        <li>
+          <strong>Limitation of liability:</strong>
+          To the fullest extent permitted by law, Sigma Wash’s liability for claims arising from its services is limited to the amount paid for those services.
+        </li>
+        <li>
+          <strong>Customer acknowledgment:</strong>
+          You confirm that you have reviewed your selected services, understand the pricing, and agree to the service terms before continuing to checkout.
+        </li>
+      </ul>
+
+      <p>By checking the box, you confirm that you have read, understood, and agree to these terms.</p>
+    </div>
+  </div>
+
+  <script>
+    const services = [
+      {
+        id: "exterior-monthly",
+        serviceName: "Monthly",
+        categoryName: "Exterior Fresh Subscriptions",
+        price: 9.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_EXTERIOR_MONTHLY",
+        description: "An affordable way to keep things fresh."
+      },
+      {
+        id: "exterior-every-other-week",
+        serviceName: "Every other week",
+        categoryName: "Exterior Fresh Subscriptions",
+        price: 17.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_EXTERIOR_EVERY_OTHER_WEEK",
+        description: "A good option for the average driver."
+      },
+      {
+        id: "exterior-weekly",
+        serviceName: "Weekly",
+        categoryName: "Exterior Fresh Subscriptions",
+        price: 29.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_EXTERIOR_WEEKLY",
+        description: "For those who want a serious clean."
+      },
+      {
+        id: "exterior-household",
+        serviceName: "Household",
+        categoryName: "Exterior Fresh Subscriptions",
+        price: 58.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_EXTERIOR_HOUSEHOLD",
+        description: "Perfect for families of two or more!"
+      },
+      {
+        id: "interior-monthly",
+        serviceName: "Monthly",
+        categoryName: "Interior Fresh Subscriptions",
+        price: 24.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_INTERIOR_MONTHLY",
+        description: "An affordable way to keep things fresh."
+      },
+      {
+        id: "interior-every-other-week",
+        serviceName: "Every other week",
+        categoryName: "Interior Fresh Subscriptions",
+        price: 44.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_INTERIOR_EVERY_OTHER_WEEK",
+        description: "A good option for the average driver."
+      },
+      {
+        id: "interior-weekly",
+        serviceName: "Weekly",
+        categoryName: "Interior Fresh Subscriptions",
+        price: 59.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_INTERIOR_WEEKLY",
+        description: "For those who want a serious clean."
+      },
+      {
+        id: "interior-household",
+        serviceName: "Household",
+        categoryName: "Interior Fresh Subscriptions",
+        price: 118.95,
+        individualSquareLink: "https://square.link/u/PLACEHOLDER_INTERIOR_HOUSEHOLD",
+        description: "Perfect for families of two or more!"
+      }
+    ];
+
+    const combinationLinks = {
+      /*
+        COMBINATION SQUARE LINKS FOOTNOTE
+        ------------------------------------------------------------
+        Paste your real Square checkout links for combined selections below.
+
+        How it works:
+        - The page automatically detects the selected Exterior Fresh + Interior Fresh combination.
+        - The key is made from the selected service IDs in alphabetical order.
+        - Replace the squareCheckoutLink placeholder with the real Square link for that exact combination.
+
+        Example:
+        If the customer selects Exterior Monthly + Interior Monthly, replace:
+        squareCheckoutLink: "PASTE_EXTERIOR_MONTHLY_INTERIOR_MONTHLY_SQUARE_LINK_HERE"
+
+        with your real Square checkout link.
+      */
+
+      "exterior-monthly+interior-monthly": {
+        combinationKey: "exterior-monthly+interior-monthly",
+        totalPrice: 34.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_MONTHLY_INTERIOR_MONTHLY_SQUARE_LINK_HERE"
+      },
+      "exterior-monthly+interior-every-other-week": {
+        combinationKey: "exterior-monthly+interior-every-other-week",
+        totalPrice: 54.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_MONTHLY_INTERIOR_EVERY_OTHER_WEEK_SQUARE_LINK_HERE"
+      },
+      "exterior-monthly+interior-weekly": {
+        combinationKey: "exterior-monthly+interior-weekly",
+        totalPrice: 69.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_MONTHLY_INTERIOR_WEEKLY_SQUARE_LINK_HERE"
+      },
+      "exterior-monthly+interior-household": {
+        combinationKey: "exterior-monthly+interior-household",
+        totalPrice: 128.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_MONTHLY_INTERIOR_HOUSEHOLD_SQUARE_LINK_HERE"
+      },
+      "exterior-every-other-week+interior-monthly": {
+        combinationKey: "exterior-every-other-week+interior-monthly",
+        totalPrice: 42.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_EVERY_OTHER_WEEK_INTERIOR_MONTHLY_SQUARE_LINK_HERE"
+      },
+      "exterior-every-other-week+interior-every-other-week": {
+        combinationKey: "exterior-every-other-week+interior-every-other-week",
+        totalPrice: 62.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_EVERY_OTHER_WEEK_INTERIOR_EVERY_OTHER_WEEK_SQUARE_LINK_HERE"
+      },
+      "exterior-every-other-week+interior-weekly": {
+        combinationKey: "exterior-every-other-week+interior-weekly",
+        totalPrice: 77.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_EVERY_OTHER_WEEK_INTERIOR_WEEKLY_SQUARE_LINK_HERE"
+      },
+      "exterior-every-other-week+interior-household": {
+        combinationKey: "exterior-every-other-week+interior-household",
+        totalPrice: 136.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_EVERY_OTHER_WEEK_INTERIOR_HOUSEHOLD_SQUARE_LINK_HERE"
+      },
+      "exterior-weekly+interior-monthly": {
+        combinationKey: "exterior-weekly+interior-monthly",
+        totalPrice: 54.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_WEEKLY_INTERIOR_MONTHLY_SQUARE_LINK_HERE"
+      },
+      "exterior-weekly+interior-every-other-week": {
+        combinationKey: "exterior-weekly+interior-every-other-week",
+        totalPrice: 74.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_WEEKLY_INTERIOR_EVERY_OTHER_WEEK_SQUARE_LINK_HERE"
+      },
+      "exterior-weekly+interior-weekly": {
+        combinationKey: "exterior-weekly+interior-weekly",
+        totalPrice: 89.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_WEEKLY_INTERIOR_WEEKLY_SQUARE_LINK_HERE"
+      },
+      "exterior-weekly+interior-household": {
+        combinationKey: "exterior-weekly+interior-household",
+        totalPrice: 148.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_WEEKLY_INTERIOR_HOUSEHOLD_SQUARE_LINK_HERE"
+      },
+      "exterior-household+interior-monthly": {
+        combinationKey: "exterior-household+interior-monthly",
+        totalPrice: 83.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_HOUSEHOLD_INTERIOR_MONTHLY_SQUARE_LINK_HERE"
+      },
+      "exterior-household+interior-every-other-week": {
+        combinationKey: "exterior-household+interior-every-other-week",
+        totalPrice: 103.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_HOUSEHOLD_INTERIOR_EVERY_OTHER_WEEK_SQUARE_LINK_HERE"
+      },
+      "exterior-household+interior-weekly": {
+        combinationKey: "exterior-household+interior-weekly",
+        totalPrice: 118.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_HOUSEHOLD_INTERIOR_WEEKLY_SQUARE_LINK_HERE"
+      },
+      "exterior-household+interior-household": {
+        combinationKey: "exterior-household+interior-household",
+        totalPrice: 177.90,
+        squareCheckoutLink: "PASTE_EXTERIOR_HOUSEHOLD_INTERIOR_HOUSEHOLD_SQUARE_LINK_HERE"
+      }
+    };
+
+    const categoryDescriptions = {
+      "Exterior Fresh Subscriptions": "We offer four types of subscription plans for exterior washes.",
+      "Interior Fresh Subscriptions": "We offer four types of subscription plans for interior washes."
+    };
+
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const menuToggle = document.getElementById("menuToggle");
+    const serviceSections = document.getElementById("serviceSections");
+    const selectedServicesList = document.getElementById("selectedServicesList");
+    const totalPrice = document.getElementById("totalPrice");
+    const checkoutButton = document.getElementById("checkoutButton");
+    const agreeTerms = document.getElementById("agreeTerms");
+    const openTerms = document.getElementById("openTerms");
+    const closeTerms = document.getElementById("closeTerms");
+    const termsModal = document.getElementById("termsModal");
+    const termsOverlay = document.getElementById("termsOverlay");
+
+    let currentCheckoutLink = "";
+    let currentCheckoutIsValid = false;
+
+    function openSidebar() {
+      sidebar.classList.add("open");
+      overlay.classList.add("show");
+    }
+
+    function closeSidebarNow() {
+      sidebar.classList.remove("open");
+      overlay.classList.remove("show");
+    }
+
+    function showTerms() {
+      termsModal.classList.add("show");
+      document.body.classList.add("modal-open");
+    }
+
+    function hideTerms() {
+      termsModal.classList.remove("show");
+      document.body.classList.remove("modal-open");
+    }
+
+    function roundCurrency(value) {
+      return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+    }
+
+    function formatCurrency(value) {
+      return "$" + roundCurrency(value).toFixed(2);
+    }
+
+    function slugify(value) {
+      return String(value)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function hasRealSquareLink(link) {
+      return Boolean(link) && !String(link).startsWith("PASTE_") && !String(link).includes("PLACEHOLDER");
+    }
+
+    function getCategories() {
+      return [...new Set(services.map(service => service.categoryName))];
+    }
+
+    function createCombinationKey(selectedServices) {
+      return selectedServices
+        .map(service => service.id)
+        .sort()
+        .join("+");
+    }
+
+    function getSelectedServices() {
+      return Array.from(document.querySelectorAll(".service-option:checked"))
+        .map(input => services.find(service => service.id === input.value))
+        .filter(Boolean);
+    }
+
+    function getSelectedTotal(selectedServices) {
+      return roundCurrency(
+        selectedServices.reduce((total, service) => total + service.price, 0)
+      );
+    }
+
+    function renderServiceSections() {
+      const categories = getCategories();
+
+      serviceSections.innerHTML = categories.map(category => {
+        const categoryId = "category-" + slugify(category);
+        const inputName = slugify(category);
+        const categoryServices = services.filter(service => service.categoryName === category);
+
+        return `
+          <section class="glass-card selection-card" id="${categoryId}">
+            <div class="selection-header">
+              <div>
+                <h2>${category}</h2>
+                <p class="subtext">${categoryDescriptions[category] || "Choose one option from this category."}</p>
+              </div>
+              <button type="button" class="category-clear" data-category="${category}">
+                Clear Selection
+              </button>
+            </div>
+
+            <div class="radio-group service-slider">
+              ${categoryServices.map(service => `
+                <label class="radio-card">
+                  <input
+                    type="radio"
+                    class="service-option"
+                    name="${inputName}"
+                    value="${service.id}"
+                    data-category="${service.categoryName}"
+                  />
+                  <span>
+                    <strong class="radio-price">${formatCurrency(service.price)}</strong>
+                    <strong class="service-title">${service.serviceName}</strong>
+                    <small>${service.description}</small>
+                  </span>
+                </label>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".service-option").forEach(input => {
+        input.addEventListener("change", updateSummary);
+      });
+
+      document.querySelectorAll(".category-clear").forEach(button => {
+        button.addEventListener("click", () => {
+          const category = button.dataset.category;
+          document.querySelectorAll(`.service-option[data-category="${category}"]`).forEach(input => {
+            input.checked = false;
+          });
+          updateSummary();
+        });
+      });
+    }
+
+    function renderSelectedServices(selectedServices) {
+      if (!selectedServices.length) {
+        selectedServicesList.innerHTML = `<div class="summary-empty">No services selected yet.</div>`;
+        return;
+      }
+
+      selectedServicesList.innerHTML = selectedServices.map(service => `
+        <div class="summary-item">
+          <div>
+            <strong>${service.serviceName}</strong>
+            <small>${service.categoryName} · ${service.description}</small>
+          </div>
+          <div class="summary-price">${formatCurrency(service.price)}</div>
+        </div>
+      `).join("");
+    }
+
+    function getCheckoutStatus(selectedServices) {
+      if (!selectedServices.length) {
+        return {
+          checkoutLink: "",
+          isValid: false
+        };
+      }
+
+      if (selectedServices.length === 1) {
+        return {
+          checkoutLink: selectedServices[0].individualSquareLink,
+          isValid: hasRealSquareLink(selectedServices[0].individualSquareLink)
+        };
+      }
+
+      const combinationKey = createCombinationKey(selectedServices);
+      const matchedCombination = combinationLinks[combinationKey];
+
+      if (matchedCombination && hasRealSquareLink(matchedCombination.squareCheckoutLink)) {
+        return {
+          checkoutLink: matchedCombination.squareCheckoutLink,
+          isValid: true
+        };
+      }
+
+      return {
+        checkoutLink: "",
+        isValid: false
+      };
+    }
+
+    function updateSummary() {
+      const selectedServices = getSelectedServices();
+      const selectedTotal = getSelectedTotal(selectedServices);
+      const checkoutStatus = getCheckoutStatus(selectedServices);
+
+      currentCheckoutLink = checkoutStatus.checkoutLink;
+      currentCheckoutIsValid = checkoutStatus.isValid;
+
+      renderSelectedServices(selectedServices);
+      totalPrice.textContent = formatCurrency(selectedTotal);
+
+      checkoutButton.disabled = !selectedServices.length || !agreeTerms.checked || !checkoutStatus.isValid;
+    }
+
+    menuToggle.addEventListener("click", () => {
+      if (sidebar.classList.contains("open")) {
+        closeSidebarNow();
+      } else {
+        openSidebar();
+      }
+    });
+
+    overlay.addEventListener("click", closeSidebarNow);
+
+    document.querySelectorAll(".sidebar a").forEach(link => {
+      link.addEventListener("click", () => {
+        if (window.innerWidth <= 920) {
+          closeSidebarNow();
+        }
+      });
+    });
+
+    openTerms.addEventListener("click", showTerms);
+    closeTerms.addEventListener("click", hideTerms);
+    termsOverlay.addEventListener("click", hideTerms);
+    agreeTerms.addEventListener("change", updateSummary);
+
+    checkoutButton.addEventListener("click", () => {
+      if (!currentCheckoutIsValid || !currentCheckoutLink) {
+        return;
+      }
+
+      window.location.href = currentCheckoutLink;
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeSidebarNow();
+        hideTerms();
+      }
+    });
+
+    renderServiceSections();
+    updateSummary();
+  </script>
+</body>
+</html>
