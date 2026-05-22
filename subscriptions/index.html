@@ -474,6 +474,37 @@
       border-radius: 16px;
     }
 
+    .customer-fields {
+      display: grid;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .customer-field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .customer-field label {
+      font-size: 0.9rem;
+    }
+
+    .customer-field input {
+      border-radius: 14px;
+    }
+
+    .checkout-help {
+      display: none;
+      margin-top: 10px;
+      color: #b00020;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .checkout-help.show {
+      display: block;
+    }
+
     .terms-box input[type="checkbox"] {
       appearance: none;
       -webkit-appearance: none;
@@ -938,6 +969,33 @@
               <div class="total-label">Total Price</div>
               <div class="total-price" id="totalPrice">$0.00</div>
 
+              <div class="customer-fields" aria-label="Customer contact information">
+                <div class="customer-field">
+                  <label for="customerName">Full name</label>
+                  <input
+                    type="text"
+                    id="customerName"
+                    name="customerName"
+                    autocomplete="name"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+
+                <div class="customer-field">
+                  <label for="customerPhone">Phone number</label>
+                  <input
+                    type="tel"
+                    id="customerPhone"
+                    name="phoneNumber"
+                    autocomplete="tel"
+                    inputmode="tel"
+                    placeholder="Enter your phone number"
+                    required
+                  />
+                </div>
+              </div>
+
               <div class="terms-box">
                 <input type="checkbox" id="agreeTerms" />
                 <div class="terms-text">
@@ -946,6 +1004,10 @@
                     Terms & Conditions / Service Waiver
                   </button>
                 </div>
+              </div>
+
+              <div class="checkout-help" id="checkoutHelp">
+                Please select a service, add your name and phone number, and agree to the terms before checkout.
               </div>
 
               <button type="button" class="button checkout-button" id="checkoutButton" disabled>
@@ -959,6 +1021,23 @@
       </div>
     </main>
   </div>
+
+
+  <form
+    id="customerInfoSheetForm"
+    method="post"
+    target="hiddenSheetSubmitFrame"
+    action="https://sigmawash-booking.quantitativemidwest.workers.dev/"
+    style="display:none;"
+  >
+    <input type="hidden" id="sheetCustomerName" name="customerName" />
+    <input type="hidden" id="sheetPhoneNumber" name="phoneNumber" />
+  </form>
+  <iframe
+    name="hiddenSheetSubmitFrame"
+    title="Hidden customer information submit frame"
+    style="display:none;"
+  ></iframe>
 
   <div class="terms-modal" id="termsModal">
     <div class="terms-overlay" id="termsOverlay"></div>
@@ -1402,6 +1481,13 @@
     const selectedServicesList = document.getElementById("selectedServicesList");
     const totalPrice = document.getElementById("totalPrice");
     const checkoutButton = document.getElementById("checkoutButton");
+    const checkoutHelp = document.getElementById("checkoutHelp");
+    const customerName = document.getElementById("customerName");
+    const customerPhone = document.getElementById("customerPhone");
+    const customerInfoSheetForm = document.getElementById("customerInfoSheetForm");
+    const sheetCustomerName = document.getElementById("sheetCustomerName");
+    const sheetPhoneNumber = document.getElementById("sheetPhoneNumber");
+    const hiddenSheetSubmitFrame = document.querySelector('iframe[name="hiddenSheetSubmitFrame"]');
     const agreeTerms = document.getElementById("agreeTerms");
     const openTerms = document.getElementById("openTerms");
     const closeTerms = document.getElementById("closeTerms");
@@ -1410,6 +1496,10 @@
 
     let currentCheckoutLink = "";
     let currentCheckoutIsValid = false;
+    let checkoutSubmissionInProgress = false;
+    let sheetSubmissionInProgress = false;
+    let sheetSubmissionResolve = null;
+    let sheetSubmissionTimer = null;
 
     function openSidebar() {
       sidebar.classList.add("open");
@@ -1448,6 +1538,75 @@
 
     function hasRealSquareLink(link) {
       return Boolean(link) && !String(link).startsWith("PASTE_") && !String(link).includes("PLACEHOLDER");
+    }
+
+    function normalizePhone(value) {
+      return String(value).replace(/\D/g, "");
+    }
+
+    function isCustomerInfoValid() {
+      const nameValue = customerName.value.trim();
+      const phoneDigits = normalizePhone(customerPhone.value);
+
+      return nameValue.length >= 2 && phoneDigits.length >= 10;
+    }
+
+    function buildCheckoutUrl(link) {
+      const checkoutUrl = new URL(link, window.location.href);
+
+      checkoutUrl.searchParams.set("customer_name", customerName.value.trim());
+      checkoutUrl.searchParams.set("customer_phone", customerPhone.value.trim());
+
+      return checkoutUrl.toString();
+    }
+
+    function finishSheetSubmission() {
+      if (!sheetSubmissionResolve) {
+        return;
+      }
+
+      const resolve = sheetSubmissionResolve;
+      sheetSubmissionResolve = null;
+      sheetSubmissionInProgress = false;
+
+      if (sheetSubmissionTimer) {
+        clearTimeout(sheetSubmissionTimer);
+        sheetSubmissionTimer = null;
+      }
+
+      resolve();
+    }
+
+    function submitCustomerInfoToSheet() {
+      if (!customerInfoSheetForm || !sheetCustomerName || !sheetPhoneNumber) {
+        return Promise.resolve();
+      }
+
+      sheetCustomerName.value = customerName.value.trim();
+      sheetPhoneNumber.value = customerPhone.value.trim();
+
+      sheetSubmissionInProgress = true;
+
+      return new Promise(resolve => {
+        sheetSubmissionResolve = resolve;
+        sheetSubmissionTimer = window.setTimeout(finishSheetSubmission, 5000);
+        HTMLFormElement.prototype.submit.call(customerInfoSheetForm);
+      });
+    }
+
+    function updateCheckoutHelp(isReady) {
+      if (!checkoutHelp) {
+        return;
+      }
+
+      if (checkoutSubmissionInProgress) {
+        checkoutHelp.textContent = "Recording your name and phone number before checkout...";
+        checkoutHelp.classList.add("show");
+        return;
+      }
+
+      checkoutHelp.textContent = "Please select a service, add your name and phone number, and agree to the terms before checkout.";
+      checkoutHelp.classList.toggle("show", !isReady);
     }
 
     function getCategories() {
@@ -1589,7 +1748,16 @@
       renderSelectedServices(selectedServices);
       totalPrice.textContent = formatCurrency(selectedTotal);
 
-      checkoutButton.disabled = !selectedServices.length || !agreeTerms.checked || !checkoutStatus.isValid;
+      const customerInfoIsValid = isCustomerInfoValid();
+      const checkoutIsReady = Boolean(
+        selectedServices.length &&
+        agreeTerms.checked &&
+        checkoutStatus.isValid &&
+        customerInfoIsValid
+      );
+
+      checkoutButton.disabled = !checkoutIsReady || checkoutSubmissionInProgress;
+      updateCheckoutHelp(checkoutIsReady);
     }
 
     menuToggle.addEventListener("click", () => {
@@ -1614,13 +1782,35 @@
     closeTerms.addEventListener("click", hideTerms);
     termsOverlay.addEventListener("click", hideTerms);
     agreeTerms.addEventListener("change", updateSummary);
+    customerName.addEventListener("input", updateSummary);
+    customerPhone.addEventListener("input", updateSummary);
 
-    checkoutButton.addEventListener("click", () => {
-      if (!currentCheckoutIsValid || !currentCheckoutLink) {
+    if (hiddenSheetSubmitFrame) {
+      hiddenSheetSubmitFrame.addEventListener("load", () => {
+        if (sheetSubmissionInProgress) {
+          finishSheetSubmission();
+        }
+      });
+    }
+
+    checkoutButton.addEventListener("click", async () => {
+      if (!currentCheckoutIsValid || !currentCheckoutLink || !isCustomerInfoValid() || checkoutSubmissionInProgress) {
         return;
       }
 
-      window.location.href = currentCheckoutLink;
+      const originalButtonText = checkoutButton.textContent;
+      checkoutSubmissionInProgress = true;
+      checkoutButton.disabled = true;
+      checkoutButton.textContent = "Recording info...";
+      updateCheckoutHelp(false);
+
+      await submitCustomerInfoToSheet();
+
+      window.location.href = buildCheckoutUrl(currentCheckoutLink);
+
+      checkoutButton.textContent = originalButtonText;
+      checkoutSubmissionInProgress = false;
+      updateSummary();
     });
 
     document.addEventListener("keydown", event => {
