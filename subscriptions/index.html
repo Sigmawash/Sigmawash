@@ -1032,6 +1032,8 @@
   >
     <input type="hidden" id="sheetCustomerName" name="customerName" />
     <input type="hidden" id="sheetPhoneNumber" name="phoneNumber" />
+    <input type="hidden" id="sheetOriginalPrice" name="originalPrice" />
+    <input type="hidden" id="sheetAgreeTerms" name="agreeTerms" />
   </form>
   <iframe
     name="hiddenSheetSubmitFrame"
@@ -1487,6 +1489,8 @@
     const customerInfoSheetForm = document.getElementById("customerInfoSheetForm");
     const sheetCustomerName = document.getElementById("sheetCustomerName");
     const sheetPhoneNumber = document.getElementById("sheetPhoneNumber");
+    const sheetOriginalPrice = document.getElementById("sheetOriginalPrice");
+    const sheetAgreeTerms = document.getElementById("sheetAgreeTerms");
     const hiddenSheetSubmitFrame = document.querySelector('iframe[name="hiddenSheetSubmitFrame"]');
     const agreeTerms = document.getElementById("agreeTerms");
     const openTerms = document.getElementById("openTerms");
@@ -1554,8 +1558,13 @@
     function buildCheckoutUrl(link) {
       const checkoutUrl = new URL(link, window.location.href);
 
+      const selectedServices = getSelectedServices();
+      const originalPrice = getSelectedTotal(selectedServices).toFixed(2);
+
       checkoutUrl.searchParams.set("customer_name", customerName.value.trim());
       checkoutUrl.searchParams.set("customer_phone", customerPhone.value.trim());
+      checkoutUrl.searchParams.set("original_price", originalPrice);
+      checkoutUrl.searchParams.set("agreed_to_terms", agreeTerms.checked ? "Yes" : "No");
 
       return checkoutUrl.toString();
     }
@@ -1578,12 +1587,17 @@
     }
 
     function submitCustomerInfoToSheet() {
-      if (!customerInfoSheetForm || !sheetCustomerName || !sheetPhoneNumber) {
+      if (!customerInfoSheetForm || !sheetCustomerName || !sheetPhoneNumber || !sheetOriginalPrice || !sheetAgreeTerms) {
         return Promise.resolve();
       }
 
+      const selectedServices = getSelectedServices();
+      const originalPrice = getSelectedTotal(selectedServices).toFixed(2);
+
       sheetCustomerName.value = customerName.value.trim();
       sheetPhoneNumber.value = customerPhone.value.trim();
+      sheetOriginalPrice.value = originalPrice;
+      sheetAgreeTerms.value = agreeTerms.checked ? "Yes" : "No";
 
       sheetSubmissionInProgress = true;
 
