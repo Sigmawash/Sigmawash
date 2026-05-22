@@ -679,48 +679,76 @@
         flex-direction: column;
       }
     }
+
+    .layout.no-sidebar .main {
+      margin-left: 0;
+      width: 100%;
+    }
+
+    .contact-card {
+      align-self: stretch;
+    }
   </style>
 </head>
-</head>
- <div class="page">
+<body>
+  <div class="layout no-sidebar">
+    <main class="main">
+      <div class="page">
         <section class="hero">
           <div class="hero-copy">
             <h1>Where quality meets affordability</h1>
             <p>
               Sigma Wash delivers a delicate hand-wash experience to your doorstep and on your schedule.
             </p>
-            
+
             <div class="hero-links">
-              <a href="/" class="window.location.href=">Go Back</a>
+              <a href="/">Go Back</a>
             </div>
           </div>
-      <section class="glass-card" id="contact">
-  <h2>Contact Us</h2>
-  <div class="info-grid">
-    <div class="mini-card">
-      <h3>Phone</h3>
-      <p>(913) 357-7522</p>
-    </div>
-    <div class="mini-card">
-      <h3>Email</h3>
-      <p><a href="customersupport@sigmawash.us" target="_blank">Send us an email</a></p>
-    </div>
-    <div class="mini-card">
-      <h3>Facebook</h3>
-      <p><a href="https://www.facebook.com/share/1Awjv5vk6f/?mibextid=wwXIfr" target="_blank">Visit our Facebook</a></p>
-    </div>
 
-    <div class="mini-card">
-      <h3>Instagram</h3>
-      <p><a href="https://www.instagram.com/sigma.wash?igsh=MXdsNjhwbW9lZXJsZA%3D%3D&utm_source=qr" target="_blank">Visit our Instagram</a></p>
-    </div>
+          <section class="glass-card contact-card" id="contact">
+            <h2>Contact Us</h2>
 
-    <div class="mini-card">
-      <h3>TikTok</h3>
-      <p><a href="https://www.tiktok.com/@sigma.wash?_r=1&_t=ZT-95bZwt8BDhd" target="_blank">Visit our TikTok</a></p>
-    </div>
-  </div>
-</section>
+            <div class="info-grid">
+              <div class="mini-card">
+                <h3>Phone</h3>
+                <p><a href="tel:+19133577522">(913) 357-7522</a></p>
+              </div>
+
+              <div class="mini-card">
+                <h3>Email</h3>
+                <p><a href="mailto:customersupport@sigmawash.us">customersupport@sigmawash.us</a></p>
+              </div>
+
+              <div class="mini-card">
+                <h3>Facebook</h3>
+                <p>
+                  <a href="https://www.facebook.com/share/1Awjv5vk6f/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                    Visit our Facebook
+                  </a>
+                </p>
+              </div>
+
+              <div class="mini-card">
+                <h3>Instagram</h3>
+                <p>
+                  <a href="https://www.instagram.com/sigma.wash?igsh=MXdsNjhwbW9lZXJsZA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                    Visit our Instagram
+                  </a>
+                </p>
+              </div>
+
+              <div class="mini-card">
+                <h3>TikTok</h3>
+                <p>
+                  <a href="https://www.tiktok.com/@sigma.wash?_r=1&_t=ZT-95bZwt8BDhd" target="_blank" rel="noopener noreferrer">
+                    Visit our TikTok
+                  </a>
+                </p>
+              </div>
+            </div>
+          </section>
+        </section>
 
         <div class="footer-space"></div>
       </div>
@@ -737,24 +765,30 @@
     let formSubmitted = false;
 
     function openSidebar() {
+      if (!sidebar || !overlay) return;
       sidebar.classList.add('open');
       overlay.classList.add('show');
     }
 
     function closeSidebar() {
+      if (!sidebar || !overlay) return;
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
     }
 
-    if (menuToggle) menuToggle.addEventListener('click', () => {
-      if (sidebar.classList.contains('open')) {
-        closeSidebar();
-      } else {
-        openSidebar();
-      }
-    });
+    if (menuToggle && sidebar) {
+      menuToggle.addEventListener('click', () => {
+        if (sidebar.classList.contains('open')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+    }
 
-    if (overlay) overlay.addEventListener('click', closeSidebar);
+    if (overlay) {
+      overlay.addEventListener('click', closeSidebar);
+    }
 
     document.querySelectorAll('.sidebar a').forEach(link => {
       link.addEventListener('click', () => {
@@ -764,35 +798,43 @@
       });
     });
 
-    if (form) form.addEventListener('submit', function () {
-      const selectedService = document.querySelector('input[name="serviceType"]:checked');
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        const selectedService = document.querySelector('input[name="serviceType"]:checked');
 
-      if (!selectedService) {
-        if (statusMessage) {
-          statusMessage.textContent = 'Please choose a service.';
-          statusMessage.style.color = '#d70015';
+        if (!selectedService && document.querySelector('input[name="serviceType"]')) {
+          event.preventDefault();
+
+          if (statusMessage) {
+            statusMessage.textContent = 'Please choose a service.';
+            statusMessage.style.color = '#d70015';
+          }
+
+          return;
         }
-        return;
-      }
 
-      formSubmitted = true;
-      if (statusMessage) {
-        statusMessage.textContent = 'Submitting request...';
-        statusMessage.style.color = '#0071e3';
-      }
-    });
+        formSubmitted = true;
 
-    if (hiddenSubmitFrame) hiddenSubmitFrame.addEventListener('load', function () {
-      if (!formSubmitted) return;
+        if (statusMessage) {
+          statusMessage.textContent = 'Submitting request...';
+          statusMessage.style.color = '#0071e3';
+        }
+      });
+    }
 
-      if (statusMessage) {
-        statusMessage.textContent = 'Request sent. Thank You!';
-        statusMessage.style.color = '#248a3d';
-      }
-      if (form) form.reset();
-      formSubmitted = false;
-    });
-  
+    if (hiddenSubmitFrame) {
+      hiddenSubmitFrame.addEventListener('load', function () {
+        if (!formSubmitted) return;
+
+        if (statusMessage) {
+          statusMessage.textContent = 'Request sent. Thank You!';
+          statusMessage.style.color = '#248a3d';
+        }
+
+        if (form) form.reset();
+        formSubmitted = false;
+      });
+    }
   </script>
 </body>
 </html>
