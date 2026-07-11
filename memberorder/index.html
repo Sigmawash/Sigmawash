@@ -802,7 +802,7 @@
           </p>
 
           <div class="message success" style="display:block; margin-bottom:20px;">
-            Orders are available starting July 21, 2026.
+            Orders are available starting July 20, 2026.
           </div>
 
           <div class="balance-message" id="balanceMessage">
@@ -906,7 +906,7 @@
 
     // Customers may place orders only after July 20, 2026.
     // Therefore, the first allowed appointment/order date is July 21, 2026.
-    const ORDER_START_DATE = '2026-07-21';
+    const ORDER_START_DATE = '2026-07-20';
 
     let currentAccount = null;
     let lastLookupPhone = '';
@@ -1137,7 +1137,7 @@
       }
 
       if (!appointmentDate.value || appointmentDate.value < ORDER_START_DATE) {
-        requestStatus.textContent = 'Orders can only be placed for July 21, 2026 or later.';
+        requestStatus.textContent = 'Orders can only be placed for July 20, 2026 or later.';
         requestStatus.style.color = 'var(--red)';
         appointmentDate.value = '';
         setMinimumAppointmentDate();
