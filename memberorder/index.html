@@ -801,6 +801,10 @@
             Choose the service and appointment time. The order is sent to the same ordering system with the phone number and saved account details behind the scenes.
           </p>
 
+          <div class="message success" style="display:block; margin-bottom:20px;">
+            Orders are available starting July 21, 2026.
+          </div>
+
           <div class="balance-message" id="balanceMessage">
             You have 0 car washes left for this month.
           </div>
@@ -899,6 +903,10 @@
          The backend should find the customer by phoneNumber and create the same order/confirmation as before.
     */
     const API_URL = 'https://sigmawash-booking.quantitativemidwest.workers.dev/sub';
+
+    // Customers may place orders only after July 20, 2026.
+    // Therefore, the first allowed appointment/order date is July 21, 2026.
+    const ORDER_START_DATE = '2026-07-21';
 
     let currentAccount = null;
     let lastLookupPhone = '';
@@ -1128,6 +1136,15 @@
         return;
       }
 
+      if (!appointmentDate.value || appointmentDate.value < ORDER_START_DATE) {
+        requestStatus.textContent = 'Orders can only be placed for July 21, 2026 or later.';
+        requestStatus.style.color = 'var(--red)';
+        appointmentDate.value = '';
+        setMinimumAppointmentDate();
+        buildTimeOptions();
+        return;
+      }
+
       if (Number(currentAccount.washesRemaining || 0) <= 0) {
         requestStatus.textContent = 'You do not have any washes remaining.';
         requestStatus.style.color = 'var(--red)';
@@ -1260,7 +1277,14 @@
     }
 
     function setMinimumAppointmentDate() {
-      appointmentDate.min = getLocalDateValue(new Date());
+      const todayValue = getLocalDateValue(new Date());
+      const minimumDate = todayValue > ORDER_START_DATE ? todayValue : ORDER_START_DATE;
+
+      appointmentDate.min = minimumDate;
+
+      if (appointmentDate.value && appointmentDate.value < minimumDate) {
+        appointmentDate.value = '';
+      }
     }
 
     function getMinimumAllowedMinutesForDate(selectedDate) {
