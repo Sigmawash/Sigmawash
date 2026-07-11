@@ -903,6 +903,10 @@
             Enter your details below. Payment is collected upon completion of services. Press "Pay Now" button after ordering if you wish to pay in advance. We accept all major forms of payment including Google Pay and Apple Pay and we offer a money-back satisfaction guarantee. No tipping required. All of our employees are compensated on an hourly basis.
           </p>
 
+          <div style="margin-bottom:20px; padding:14px 16px; border:1px solid #b7e4c7; background:#ecfdf3; color:#14532d; border-radius:16px; font-weight:700;">
+            Orders are available starting July 21, 2026.
+          </div>
+
           <form
             id="appointmentForm"
             method="post"
@@ -1148,6 +1152,10 @@
   </div>
 
   <script>
+    // Customers may place orders only after July 20, 2026.
+    // The first allowed booking date is July 21, 2026.
+    const ORDER_START_DATE = '2026-07-21';
+
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     const menuToggle = document.getElementById('menuToggle');
@@ -1629,7 +1637,14 @@
     }
 
     function setMinimumAppointmentDate() {
-      appointmentDate.min = getLocalDateValue(new Date());
+      const todayValue = getLocalDateValue(new Date());
+      const minimumDate = todayValue > ORDER_START_DATE ? todayValue : ORDER_START_DATE;
+
+      appointmentDate.min = minimumDate;
+
+      if (appointmentDate.value && appointmentDate.value < minimumDate) {
+        appointmentDate.value = '';
+      }
     }
 
     function validateDate() {
@@ -1640,11 +1655,11 @@
         return false;
       }
 
-      const todayValue = appointmentDate.min;
-      const isValid = appointmentDate.value >= todayValue;
+      const minimumDate = appointmentDate.min;
+      const isValid = appointmentDate.value >= minimumDate;
 
       appointmentDate.setCustomValidity(
-        isValid ? '' : 'Please choose today or a future date.'
+        isValid ? '' : 'Orders can only be placed for July 21, 2026 or later.'
       );
 
       return isValid;
@@ -2044,6 +2059,18 @@
 
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
+
+      setMinimumAppointmentDate();
+
+      if (!appointmentDate.value || appointmentDate.value < appointmentDate.min) {
+        appointmentDate.setCustomValidity('Orders can only be placed for July 21, 2026 or later.');
+        appointmentDate.reportValidity();
+        statusMessage.textContent = 'Orders can only be placed for July 21, 2026 or later.';
+        statusMessage.style.color = '#d70015';
+        return;
+      }
+
+      appointmentDate.setCustomValidity('');
 
       const selectedService = document.querySelector('input[name="serviceType"]:checked');
 
