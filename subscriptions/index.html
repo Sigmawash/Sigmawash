@@ -6,7 +6,7 @@
   <title>Sigma Wash Service Selection</title>
 
   <style>
-    :root {
+:root {
       --bg: #f5f5f7;
       --panel: #ffffff;
       --panel-soft: #fbfbfd;
@@ -837,6 +837,54 @@
         width: 100%;
       }
     }
+
+    .save-status {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f2f7ff;
+      border: 1px solid #cfe2ff;
+      color: #245b9e;
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .save-status.show {
+      display: block;
+    }
+
+    .save-status.error {
+      background: #fff3f3;
+      border-color: #ffc9c9;
+      color: #a61b1b;
+    }
+
+    .save-status.success {
+      background: #f0faf3;
+      border-color: #bfe6c9;
+      color: #216e39;
+    }
+
+    .contract-meta-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .terms-wrapper {
+      clear: both;
+    }
+
+    .terms-wrapper ol {
+      padding-left: 22px;
+    }
+
+    .terms-wrapper li {
+      margin-bottom: 18px;
+    }
+
   </style>
 </head>
 
@@ -857,7 +905,7 @@
       <div class="sidebar-group">
         <div class="sidebar-label">Booking</div>
         <nav class="sidebar-nav">
-          <a href="#services">Our Offerings</a>
+          <a href="#serviceSelections">Our Offerings</a>
         </nav>
       </div>
 
@@ -875,8 +923,9 @@
           <div class="topbar-left">
             <button class="menu-toggle" id="menuToggle" aria-label="Open sidebar">☰</button>
           </div>
+
           <nav class="menu" aria-label="Top navigation">
-            <a href="#services">Packages</a>
+            <a href="#serviceSelections">Packages</a>
             <a href="/contact/">Contact Us</a>
             <a href="/subscriptions/">Subscriptions</a>
             <a href="/TrackYourOrder/">Track Your Order</a>
@@ -895,41 +944,54 @@
             </p>
           </div>
         </section>
-        
-      <section class="glass-card" id="services">
+
+        <section class="glass-card" id="howItWorks">
           <h2>How it works</h2>
           <p class="subtext">Use the plan builder below to find the perfect subscription for you.</p>
+
           <div class="service-grid">
-            
             <div class="mini-card">
               <h3>Shareable</h3>
-              <p>You can use our services on any car in your household.
-                <span id="serviceCardExteriorSubscription1">Washes and cleanings reload each month.</span></p>
+              <p>
+                You can use our services on any car in your household.
+                <span>Washes and cleanings reload each month.</span>
+              </p>
             </div>
 
             <div class="mini-card">
               <h3>Billed month to month</h3>
-              <p>Your first month is prorated.
-                <span id="serviceCardExteriorSubscription2">Cancel anytime.</span></p>
+              <p>
+                Your first month is prorated.
+                <span>Cancel anytime.</span>
+              </p>
             </div>
 
             <div class="mini-card">
               <h3>Add-Ons included</h3>
-              <p>Just let us know if you would like your cargo area cleaned.
-                <span id="serviceCardExteriorSubscription3">No extra charge.</span></p>
+              <p>
+                Just let us know if you would like your cargo area cleaned.
+                <span>No extra charge.</span>
+              </p>
             </div>
-            
-              <div class="mini-card">
+
+            <div class="mini-card">
               <h3>Perks</h3>
-              <p>Members receive 10% off all extra services
-                <span id="serviceCardExteriorSubscription3">You get insider pricing as a member. If you run out of washes you get 20% off extra washes. Use one for yourself or buy your friend a wash.</span></p>
+              <p>
+                Members receive 10% off all extra services.
+                <span>
+                  You get insider pricing as a member. If you run out of washes you get
+                  20% off extra washes. Use one for yourself or buy your friend a wash.
+                </span>
+              </p>
             </div>
+          </div>
         </section>
-        
+
         <section class="glass-card" id="resources">
           <h2>Choose Your Services</h2>
           <p class="subtext">
-            Select one option from each category you want. You can choose a single service or create a predefined multi-service checkout.
+            Select one option from each category you want. You can choose a single
+            service or create a predefined multi-service checkout.
           </p>
 
           <div class="info-grid">
@@ -937,10 +999,12 @@
               <h3>1. Select</h3>
               <p>Pick one service plan from any section below.</p>
             </div>
+
             <div class="mini-card">
               <h3>2. Review</h3>
               <p>Your selected services and total price appear in the summary.</p>
             </div>
+
             <div class="mini-card">
               <h3>3. Checkout</h3>
               <p>The page finds the right Square link for your service or predefined combination.</p>
@@ -948,7 +1012,7 @@
           </div>
         </section>
 
-        <div id="services">
+        <div id="serviceSelections">
           <div id="serviceSections"></div>
         </div>
 
@@ -1006,9 +1070,15 @@
                 </div>
               </div>
 
+              <div class="contract-meta-note">
+                Your typed name and checked agreement box will be recorded as part of the electronic contract record.
+              </div>
+
               <div class="checkout-help" id="checkoutHelp">
                 Please select a service, add your name and phone number, and agree to the terms before checkout.
               </div>
+
+              <div class="save-status" id="saveStatus" aria-live="polite"></div>
 
               <button type="button" class="button checkout-button" id="checkoutButton" disabled>
                 Continue to Checkout
@@ -1023,50 +1093,63 @@
   </div>
 
 
+
+  <!--
+    DIRECT GOOGLE APPS SCRIPT CONTRACT SUBMISSION
+    --------------------------------------------------------------
+    This hidden form posts directly to the Google Apps Script Web App.
+    No intermediary server is used.
+  -->
   <form
-    id="customerInfoSheetForm"
+    id="contractSaveForm"
     method="post"
-    target="hiddenSheetSubmitFrame"
-    action="https://sigmawash-booking.quantitativemidwest.workers.dev/"
+    target="contractSaveFrame"
     style="display:none;"
   >
-    <input type="hidden" id="sheetCustomerName" name="customerName" />
-    <input type="hidden" id="sheetPhoneNumber" name="phoneNumber" />
-    <input type="hidden" id="sheetOriginalPrice" name="originalPrice" />
-    <input type="hidden" id="sheetAgreeTerms" name="agreeTerms" />
+    <input type="hidden" id="formRequestId" name="requestId" />
+    <input type="hidden" id="formContractId" name="contractId" />
+    <input type="hidden" id="formCustomerName" name="customerName" />
+    <input type="hidden" id="formPhoneNumber" name="phoneNumber" />
+    <input type="hidden" id="formSelectedServiceIds" name="selectedServiceIds" />
+    <input type="hidden" id="formAgreeTerms" name="agreeTerms" />
+    <input type="hidden" id="formElectronicSignature" name="electronicSignature" />
+    <input type="hidden" id="formAcceptedAtBrowser" name="acceptedAtBrowser" />
+    <input type="hidden" id="formAcceptedAtLocal" name="acceptedAtLocal" />
+    <input type="hidden" id="formPageUrl" name="pageUrl" />
+    <input type="hidden" id="formUserAgent" name="userAgent" />
+    <input type="text" id="formWebsite" name="website" tabindex="-1" autocomplete="off" />
+    <textarea id="formContractText" name="contractText"></textarea>
   </form>
+
   <iframe
-    name="hiddenSheetSubmitFrame"
-    title="Hidden customer information submit frame"
+    id="contractSaveFrame"
+    name="contractSaveFrame"
+    title="Contract save response"
     style="display:none;"
   ></iframe>
 
-  <div class="terms-modal" id="termsModal">
+  <div class="terms-modal" id="termsModal" aria-hidden="true">
     <div class="terms-overlay" id="termsOverlay"></div>
 
     <div class="terms-content">
-      <button type="button" class="close-terms" id="closeTerms">✕</button>
+      <button type="button" class="close-terms" id="closeTerms" aria-label="Close terms">✕</button>
 
-      <div class="terms-wrapper">
-  <div class="terms-content">
-    <h3>Subscription Service Agreement</h3>
-
-    <p>
+      <div class="terms-wrapper" id="contractDocument">
+<h3>Subscription Service Agreement</h3>
+<p>
       By checking the box below, you (“Customer”) confirm that you have read,
       understood, and agree to this Subscription Service Agreement with
       Quantitative Midwest doing business as Sigma Wash, a Kansas limited
       liability company (the “Company”).
     </p>
-
-    <p>
+<p>
       You understand and agree that checking the box is your electronic signature
       and has the same legal effect as signing this Agreement by hand, to the
       fullest extent permitted by law.
     </p>
-
-    <ol>
-      <li>
-        <strong>Parties and Agreement:</strong>
+<ol>
+<li>
+<strong>Parties and Agreement:</strong>
         This Subscription Service Agreement (the “Agreement”) is entered into by
         and between Quantitative Midwest doing business as Sigma Wash, a Kansas
         limited liability company (the “Company”), and the customer
@@ -1074,87 +1157,80 @@
         checks the box, electronically signs, or otherwise accepts this
         Agreement.
       </li>
-
-      <li>
-        <strong>Subscription Enrollment and Automatic Renewal:</strong>
+<li>
+<strong>Subscription Enrollment and Automatic Renewal:</strong>
         Customer agrees to enroll in the subscription service identified in the
         Subscription Summary. The subscription automatically renews according to
         the Billing Frequency unless canceled under this Agreement.
-        <br><br>
+        <br/><br/>
         Customer authorizes Company and/or its payment processor to charge
         Customer’s selected payment method on a recurring basis for all
         subscription charges, fees, taxes, and other amounts due under this
         Agreement.
       </li>
-
-      <li>
-        <strong>Service Scope; Company Discretion:</strong>
+<li>
+<strong>Service Scope; Company Discretion:</strong>
         The services provided under the subscription are limited to the services,
         scope, frequency, availability, location, and conditions determined by
         Company. Company may modify, limit, substitute, discontinue, or refuse
         any service to the fullest extent permitted by law.
-        <br><br>
+        <br/><br/>
         Services are not guaranteed to be available at all times and may depend
         on scheduling, staffing, location, weather, equipment, customer demand,
         safety, business operations, third-party providers, or other conditions.
       </li>
-
-      <li>
-        <strong>Expiration of Unused Services:</strong>
+<li>
+<strong>Expiration of Unused Services:</strong>
         Any unused services, credits, sessions, visits, benefits, appointments,
         or service rights expire at the end of each monthly billing period and
         do not roll over unless Company expressly agrees in writing.
-        <br><br>
+        <br/><br/>
         For purposes of this Agreement, a monthly billing period means the
         recurring subscription period beginning on the charge date and ending
         immediately before the next recurring billing date, unless Company states
         a different billing cycle in writing.
       </li>
-
-      <li>
-        <strong>Price Changes and Plan Changes:</strong>
+<li>
+<strong>Price Changes and Plan Changes:</strong>
         Company may increase, decrease, modify, or otherwise change the
         subscription price, billing frequency, included services, or plan terms
         at any time, subject to any notice required by applicable law.
-        <br><br>
+        <br/><br/>
         If Company gives notice of a material price change, Customer’s continued
         use of the service after the updated price becomes effective constitutes
         acceptance of the updated price. Customer’s sole remedy if Customer does
         not accept a price change is to cancel the subscription before the
         updated price is charged.
       </li>
-
-      <li>
-        <strong>Cancellation by Customer:</strong>
+<li>
+<strong>Cancellation by Customer:</strong>
         Customer may cancel the subscription using the Cancellation Method listed
         in the Subscription Summary. A cancellation request must include enough
         information for Company to identify the subscription account.
-        <br><br>
+        <br/><br/>
         Unless Company states otherwise in writing, cancellation becomes
         effective at the end of the then-current paid billing period.
         Cancellation does not automatically entitle Customer to a refund for
         amounts already paid.
       </li>
-
-      <li>
-        <strong>No Refunds; Failed Payments; Chargebacks:</strong>
+<li>
+<strong>No Refunds; Failed Payments; Chargebacks:</strong>
         Payments are non-refundable except where required by applicable law or
         expressly approved in writing by Company.
-        <br><br>
+        <br/><br/>
         Company may suspend, limit, or cancel services if payment fails, is
         disputed, is reversed, is charged back, or is not received. Customer
         agrees to contact Company first regarding any billing concern, duplicate
         charge, cancellation issue, or service dispute. Customer remains
         responsible for all valid charges and amounts owed under this Agreement.
       </li>
-
-      <li>
-        <strong>Personal Use; No Resale; Sharing Responsibility:</strong>
+<li>
+<strong>Personal Use; No Resale; Sharing Responsibility:</strong>
         The subscription is personal to the individual Customer who accepts this
         Agreement. Customer may not transfer, assign, sell, sublicense, resell,
         repackage, broker, market, or commercially exploit any services provided
         under the subscription.
-        <br><br>
+        <br/><br/>
         The service is intended only for the Customer accepting this Agreement.
         If Customer shares, gifts, donates, transfers, permits access to, or
         allows another person to use any portion of the service, Customer assumes
@@ -1163,65 +1239,60 @@
         misuse, claims, losses, injuries, disputes, and consequences arising
         from that use.
       </li>
-
-      <li>
-        <strong>Customer Responsibilities:</strong>
+<li>
+<strong>Customer Responsibilities:</strong>
         Customer agrees to provide accurate information, keep payment and contact
         information current, comply with Company rules and policies, use the
         service appropriately, pay all amounts due, cooperate with scheduling and
         access requirements, and avoid misuse, unauthorized sharing, or
         unauthorized resale of the service.
-        <br><br>
+        <br/><br/>
         Customer is responsible for the conduct of any person Customer allows to
         access or receive the service.
       </li>
-
-      <li>
-        <strong>Company Right to Suspend, Refuse, or Terminate Service:</strong>
+<li>
+<strong>Company Right to Suspend, Refuse, or Terminate Service:</strong>
         Company may cancel, suspend, refuse, limit, or terminate Customer’s
         subscription or any services at any time, for any reason, including
         nonpayment, safety concerns, misuse, inappropriate conduct, operational
         limitations, scheduling limitations, violation of this Agreement, or any
         other business reason, to the fullest extent permitted by law.
-        <br><br>
+        <br/><br/>
         If Company terminates the subscription without cause before the end of a
         paid billing period, Company may provide a prorated refund, credit,
         substitute service, or no refund, except where otherwise required by
         applicable law.
       </li>
-
-      <li>
-        <strong>Prior Terms, Service Rules, and Policies:</strong>
+<li>
+<strong>Prior Terms, Service Rules, and Policies:</strong>
         This Agreement does not replace, negate, waive, override, amend, or alter
         any prior Terms of Service, website terms, service policies, waivers,
         disclaimers, rules, or other agreements that Customer has previously
         accepted or may accept when receiving the service. All such terms remain
         fully valid and enforceable to the extent permitted by law.
-        <br><br>
+        <br/><br/>
         If there is a direct conflict between this Agreement and another written
         Company policy, Company may determine which provision controls unless
         applicable law requires otherwise.
       </li>
-
-      <li>
-        <strong>Communications and Notices:</strong>
+<li>
+<strong>Communications and Notices:</strong>
         Customer agrees that Company may contact Customer by phone, email, text
         message, or other reasonable method regarding the subscription,
         appointments, scheduling, billing, account updates, cancellation, and
         service-related matters. Customer is responsible for maintaining current
         contact information.
-        <br><br>
+        <br/><br/>
         Notices sent to the contact information provided by Customer will be
         considered received by Customer unless prohibited by applicable law.
       </li>
-
-      <li>
-        <strong>Disclaimer; Limitation of Liability:</strong>
+<li>
+<strong>Disclaimer; Limitation of Liability:</strong>
         To the fullest extent permitted by law, Company disclaims all warranties
         not expressly stated in this Agreement, including implied warranties of
         merchantability, fitness for a particular purpose, and uninterrupted
         availability.
-        <br><br>
+        <br/><br/>
         To the fullest extent permitted by law, Company’s total liability arising
         out of or relating to this Agreement or the services will not exceed the
         amount Customer paid to Company for the subscription during the one-month
@@ -1229,9 +1300,8 @@
         will not be liable for indirect, incidental, consequential, special,
         punitive, or lost-profit damages.
       </li>
-
-      <li>
-        <strong>Indemnification:</strong>
+<li>
+<strong>Indemnification:</strong>
         Customer agrees to defend, indemnify, and hold harmless Company, its
         owners, employees, contractors, agents, representatives, successors, and
         assigns from any claims, losses, damages, liabilities, costs, and
@@ -1241,36 +1311,33 @@
         person Customer allows to access or receive the service, to the fullest
         extent permitted by law.
       </li>
-
-      <li>
-        <strong>Reviews and Public Statements:</strong>
+<li>
+<strong>Reviews and Public Statements:</strong>
         Nothing in this Agreement prohibits Customer from making an honest review
         or truthful statement about Customer’s experience as permitted by
         applicable law. Customer may not make statements that are knowingly
         false, misleading, defamatory, harassing, or that improperly disclose
         private, confidential, or legally protected information.
       </li>
-
-      <li>
-        <strong>Electronic Signature; Copy of Agreement:</strong>
+<li>
+<strong>Electronic Signature; Copy of Agreement:</strong>
         Customer agrees that this Agreement may be presented, reviewed, accepted,
         signed, and stored electronically. Customer agrees that Customer’s
         electronic signature, typed name, touchscreen signature, checkbox
         acceptance, or other electronic indication of agreement has the same
         effect as a handwritten signature to the fullest extent permitted by law.
-        <br><br>
+        <br/><br/>
         Customer acknowledges that Customer had the opportunity to read this
         Agreement before accepting it and may request a paper or electronic copy
         of this Agreement.
       </li>
-
-      <li>
-        <strong>Governing Law; Venue; General Terms:</strong>
+<li>
+<strong>Governing Law; Venue; General Terms:</strong>
         This Agreement is governed by the laws of the State of Kansas, without
         regard to conflict-of-law rules. Any dispute arising from or relating to
         this Agreement shall be brought in the state or federal courts located in
         Kansas, unless another venue is required by applicable law.
-        <br><br>
+        <br/><br/>
         If any provision of this Agreement is found unenforceable, the remaining
         provisions will remain in effect. This Agreement, together with any
         applicable Company terms, service rules, waivers, policies, and accepted
@@ -1281,9 +1348,8 @@
         reorganization, or business transaction. Headings are for convenience
         only.
       </li>
-
-      <li>
-        <strong>Minimum Customer Acknowledgment:</strong>
+<li>
+<strong>Minimum Customer Acknowledgment:</strong>
         Customer confirms that Customer has read this Agreement, understands this
         is a recurring subscription, authorizes recurring charges, understands
         unused services expire at the end of each monthly billing period,
@@ -1291,17 +1357,15 @@
         understands prices and services may change, and agrees not to resell or
         commercially exploit the services.
       </li>
-      
 <li>
-  <strong>Signatures:</strong>
+<strong>Signatures:</strong>
   By checking the box below, Customer accepts and agrees to this
   Subscription Service Agreement and authorizes Quantitative Midwest doing
   business as Sigma Wash to provide and bill for the subscription service
   according to the terms stated above.
 
-  <br><br>
-
-  <strong>No Company Signature Required:</strong>
+  <br/><br/>
+<strong>No Company Signature Required:</strong>
   Customer acknowledges that this Agreement becomes effective when Customer
   checks the box, electronically signs, accepts this Agreement, and
   Quantitative Midwest doing business as Sigma Wash accepts Customer’s
@@ -1311,26 +1375,42 @@
   this Agreement to be valid or enforceable.
 
 
-<br> <br><br><div>
-    <strong>I have read, understood, and agree to the Subscription Service Agreement.
+<br/> <br/><br/><div>
+<strong>I have read, understood, and agree to the Subscription Service Agreement.
     I understand that checking this box is my electronic signature and has
     the same legal effect as signing this Agreement by hand.</strong>
- 
-<br><br><br></div>
-
-    <strong>By providing your phone number, you agree to receive text messages from
+<br/><br/><br/></div>
+<strong>By providing your phone number, you agree to receive text messages from
     Quantitative Midwest doing business as Sigma Wash related to your inquiry,
     appointments, services, orders, customer support, and promotional offers.
     Message and data rates may apply. Message frequency may vary. Reply STOP
     to unsubscribe or HELP for assistance. Consent is not a condition of
     purchase. Mobile opt-in data will not be shared with third parties for
     marketing or promotional purposes. See our Privacy Policy for details.</strong>
-  
-</div>
+
 </li>
 </ol>
+      </div>
+    </div>
+  </div>
 
   <script>
+    "use strict";
+
+    /*
+      ================================================================
+      ONLY REQUIRED HTML SETTING
+      ================================================================
+      After deploying Code.gs as a Google Apps Script Web App, paste the
+      deployment URL ending in /exec below.
+
+      Example:
+      https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxx/exec
+
+      The page submits directly to Google Apps Script.
+    */
+    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzaBwrSI6stmK4L6XxF2GXsyBjj31ZQ0dTN2-Nkh3CUl8YLecFC0oE_BecAGFvQdzjIkQ/exec";
+
     const services = [
       {
         id: "exterior-monthly",
@@ -1356,7 +1436,6 @@
         individualSquareLink: "https://square.link/u/zyBKzo45",
         description: "For those who want a serious clean."
       },
-    
       {
         id: "interior-monthly",
         serviceName: "Monthly",
@@ -1380,113 +1459,51 @@
         price: 59.95,
         individualSquareLink: "https://square.link/u/fQjKc3ST",
         description: "For those who want a serious clean."
-      },
-   
+      }
     ];
 
     const combinationLinks = {
-      /*
-        COMBINATION SQUARE LINKS FOOTNOTE
-        ------------------------------------------------------------
-        Paste your real Square checkout links for combined selections below.
-
-        How it works:
-        - The page automatically detects the selected Exterior Fresh + Interior Fresh combination.
-        - The key is made from the selected service IDs in alphabetical order.
-        - Replace the squareCheckoutLink placeholder with the real Square link for that exact combination.
-
-        Example:
-        If the customer selects Exterior Monthly + Interior Monthly, replace:
-        squareCheckoutLink: "PASTE_EXTERIOR_MONTHLY_INTERIOR_MONTHLY_SQUARE_LINK_HERE"
-
-        with your real Square checkout link.
-      */
-
       "exterior-monthly+interior-monthly": {
-        combinationKey: "exterior-monthly+interior-monthly",
         totalPrice: 34.90,
         squareCheckoutLink: "https://square.link/u/3ZNFiIl6"
       },
       "exterior-monthly+interior-every-other-week": {
-        combinationKey: "exterior-monthly+interior-every-other-week",
         totalPrice: 54.90,
         squareCheckoutLink: "https://square.link/u/I50ia3pV"
       },
       "exterior-monthly+interior-weekly": {
-        combinationKey: "exterior-monthly+interior-weekly",
         totalPrice: 69.90,
         squareCheckoutLink: "https://square.link/u/Y5919yH4"
       },
-      "exterior-monthly+interior-household": {
-        combinationKey: "exterior-monthly+interior-household",
-        totalPrice: 128.90,
-        squareCheckoutLink: "https://square.link/u/szeB962a"
-      },
       "exterior-every-other-week+interior-monthly": {
-        combinationKey: "exterior-every-other-week+interior-monthly",
         totalPrice: 42.90,
         squareCheckoutLink: "https://square.link/u/UGTrKp5f"
       },
       "exterior-every-other-week+interior-every-other-week": {
-        combinationKey: "exterior-every-other-week+interior-every-other-week",
         totalPrice: 62.90,
         squareCheckoutLink: "https://square.link/u/VDco6bVF"
       },
       "exterior-every-other-week+interior-weekly": {
-        combinationKey: "exterior-every-other-week+interior-weekly",
         totalPrice: 77.90,
         squareCheckoutLink: "https://square.link/u/di4No0G7"
       },
-      "exterior-every-other-week+interior-household": {
-        combinationKey: "exterior-every-other-week+interior-household",
-        totalPrice: 136.90,
-        squareCheckoutLink: "https://square.link/u/nuzZEkV5"
-      },
       "exterior-weekly+interior-monthly": {
-        combinationKey: "exterior-weekly+interior-monthly",
         totalPrice: 54.90,
         squareCheckoutLink: "https://square.link/u/dGHjmJdz"
       },
       "exterior-weekly+interior-every-other-week": {
-        combinationKey: "exterior-weekly+interior-every-other-week",
         totalPrice: 74.90,
         squareCheckoutLink: "https://square.link/u/bRpplnW1"
       },
       "exterior-weekly+interior-weekly": {
-        combinationKey: "exterior-weekly+interior-weekly",
         totalPrice: 89.90,
         squareCheckoutLink: "https://square.link/u/9lKt4m2q"
-      },
-      "exterior-weekly+interior-household": {
-        combinationKey: "exterior-weekly+interior-household",
-        totalPrice: 148.90,
-        squareCheckoutLink: "https://square.link/u/9uU092q3"
-      },
-      "exterior-household+interior-monthly": {
-        combinationKey: "exterior-household+interior-monthly",
-        totalPrice: 83.90,
-        squareCheckoutLink: "https://square.link/u/xuEWmCHp"
-      },
-      "exterior-household+interior-every-other-week": {
-        combinationKey: "exterior-household+interior-every-other-week",
-        totalPrice: 103.90,
-        squareCheckoutLink: "https://square.link/u/zL5ot0BX"
-      },
-      "exterior-household+interior-weekly": {
-        combinationKey: "exterior-household+interior-weekly",
-        totalPrice: 118.90,
-        squareCheckoutLink: "https://square.link/u/G7nsZu75"
-      },
-      "exterior-household+interior-household": {
-        combinationKey: "exterior-household+interior-household",
-        totalPrice: 177.90,
-        squareCheckoutLink: "https://square.link/u/jNCw0PeS"
       }
     };
 
     const categoryDescriptions = {
-      "Exterior Fresh Subscriptions": "We offer four types of subscription plans for exterior washes.",
-      "Interior Fresh Subscriptions": "We offer four types of subscription plans for interior washes."
+      "Exterior Fresh Subscriptions": "We offer three types of subscription plans for exterior washes.",
+      "Interior Fresh Subscriptions": "We offer three types of subscription plans for interior washes."
     };
 
     const sidebar = document.getElementById("sidebar");
@@ -1497,26 +1514,37 @@
     const totalPrice = document.getElementById("totalPrice");
     const checkoutButton = document.getElementById("checkoutButton");
     const checkoutHelp = document.getElementById("checkoutHelp");
+    const saveStatus = document.getElementById("saveStatus");
     const customerName = document.getElementById("customerName");
     const customerPhone = document.getElementById("customerPhone");
-    const customerInfoSheetForm = document.getElementById("customerInfoSheetForm");
-    const sheetCustomerName = document.getElementById("sheetCustomerName");
-    const sheetPhoneNumber = document.getElementById("sheetPhoneNumber");
-    const sheetOriginalPrice = document.getElementById("sheetOriginalPrice");
-    const sheetAgreeTerms = document.getElementById("sheetAgreeTerms");
-    const hiddenSheetSubmitFrame = document.querySelector('iframe[name="hiddenSheetSubmitFrame"]');
     const agreeTerms = document.getElementById("agreeTerms");
     const openTerms = document.getElementById("openTerms");
     const closeTerms = document.getElementById("closeTerms");
     const termsModal = document.getElementById("termsModal");
     const termsOverlay = document.getElementById("termsOverlay");
+    const contractDocument = document.getElementById("contractDocument");
+
+    const contractSaveForm = document.getElementById("contractSaveForm");
+    const contractSaveFrame = document.getElementById("contractSaveFrame");
+    const formRequestId = document.getElementById("formRequestId");
+    const formContractId = document.getElementById("formContractId");
+    const formCustomerName = document.getElementById("formCustomerName");
+    const formPhoneNumber = document.getElementById("formPhoneNumber");
+    const formSelectedServiceIds = document.getElementById("formSelectedServiceIds");
+    const formAgreeTerms = document.getElementById("formAgreeTerms");
+    const formElectronicSignature = document.getElementById("formElectronicSignature");
+    const formAcceptedAtBrowser = document.getElementById("formAcceptedAtBrowser");
+    const formAcceptedAtLocal = document.getElementById("formAcceptedAtLocal");
+    const formPageUrl = document.getElementById("formPageUrl");
+    const formUserAgent = document.getElementById("formUserAgent");
+    const formContractText = document.getElementById("formContractText");
+    const formWebsite = document.getElementById("formWebsite");
 
     let currentCheckoutLink = "";
     let currentCheckoutIsValid = false;
     let checkoutSubmissionInProgress = false;
-    let sheetSubmissionInProgress = false;
-    let sheetSubmissionResolve = null;
-    let sheetSubmissionTimer = null;
+    let pendingContractSnapshot = null;
+    let pendingAppsScriptRequest = null;
 
     function openSidebar() {
       sidebar.classList.add("open");
@@ -1530,11 +1558,13 @@
 
     function showTerms() {
       termsModal.classList.add("show");
+      termsModal.setAttribute("aria-hidden", "false");
       document.body.classList.add("modal-open");
     }
 
     function hideTerms() {
       termsModal.classList.remove("show");
+      termsModal.setAttribute("aria-hidden", "true");
       document.body.classList.remove("modal-open");
     }
 
@@ -1554,7 +1584,15 @@
     }
 
     function hasRealSquareLink(link) {
-      return Boolean(link) && !String(link).startsWith("PASTE_") && !String(link).includes("PLACEHOLDER");
+      return Boolean(link) &&
+        !String(link).startsWith("PASTE_") &&
+        !String(link).includes("PLACEHOLDER");
+    }
+
+    function hasRealAppsScriptUrl() {
+      return /^https:\/\/script\.google\.com\/macros\/s\/.+\/exec(?:\?.*)?$/i.test(
+        String(APPS_SCRIPT_WEB_APP_URL || "").trim()
+      );
     }
 
     function normalizePhone(value) {
@@ -1565,82 +1603,9 @@
       const nameValue = customerName.value.trim();
       const phoneDigits = normalizePhone(customerPhone.value);
 
-      return nameValue.length >= 2 && phoneDigits.length >= 10;
-    }
-
-    function getDisplayedTotalPriceValue() {
-      const displayedTotal = totalPrice.textContent.trim();
-
-      if (displayedTotal) {
-        return displayedTotal;
-      }
-
-      return formatCurrency(getSelectedTotal(getSelectedServices()));
-    }
-
-    function buildCheckoutUrl(link) {
-      const checkoutUrl = new URL(link, window.location.href);
-      const originalPrice = getDisplayedTotalPriceValue();
-
-      checkoutUrl.searchParams.set("customer_name", customerName.value.trim());
-      checkoutUrl.searchParams.set("customer_phone", customerPhone.value.trim());
-      checkoutUrl.searchParams.set("original_price", originalPrice);
-      checkoutUrl.searchParams.set("agreed_to_terms", agreeTerms.checked ? "Yes" : "No");
-
-      return checkoutUrl.toString();
-    }
-
-    function finishSheetSubmission() {
-      if (!sheetSubmissionResolve) {
-        return;
-      }
-
-      const resolve = sheetSubmissionResolve;
-      sheetSubmissionResolve = null;
-      sheetSubmissionInProgress = false;
-
-      if (sheetSubmissionTimer) {
-        clearTimeout(sheetSubmissionTimer);
-        sheetSubmissionTimer = null;
-      }
-
-      resolve();
-    }
-
-    function submitCustomerInfoToSheet() {
-      if (!customerInfoSheetForm || !sheetCustomerName || !sheetPhoneNumber || !sheetOriginalPrice || !sheetAgreeTerms) {
-        return Promise.resolve();
-      }
-
-      const originalPrice = getDisplayedTotalPriceValue();
-
-      sheetCustomerName.value = customerName.value.trim();
-      sheetPhoneNumber.value = customerPhone.value.trim();
-      sheetOriginalPrice.value = originalPrice;
-      sheetAgreeTerms.value = agreeTerms.checked ? "Yes" : "No";
-
-      sheetSubmissionInProgress = true;
-
-      return new Promise(resolve => {
-        sheetSubmissionResolve = resolve;
-        sheetSubmissionTimer = window.setTimeout(finishSheetSubmission, 5000);
-        HTMLFormElement.prototype.submit.call(customerInfoSheetForm);
-      });
-    }
-
-    function updateCheckoutHelp(isReady) {
-      if (!checkoutHelp) {
-        return;
-      }
-
-      if (checkoutSubmissionInProgress) {
-        checkoutHelp.textContent = "Recording your name and phone number before checkout...";
-        checkoutHelp.classList.add("show");
-        return;
-      }
-
-      checkoutHelp.textContent = "Please select a service, add your name and phone number, and agree to the terms before checkout.";
-      checkoutHelp.classList.toggle("show", !isReady);
+      return nameValue.length >= 2 &&
+        phoneDigits.length >= 10 &&
+        phoneDigits.length <= 15;
     }
 
     function getCategories() {
@@ -1666,13 +1631,69 @@
       );
     }
 
+    function getCheckoutStatus(selectedServices) {
+      if (!selectedServices.length) {
+        return { checkoutLink: "", isValid: false };
+      }
+
+      if (selectedServices.length === 1) {
+        return {
+          checkoutLink: selectedServices[0].individualSquareLink,
+          isValid: hasRealSquareLink(selectedServices[0].individualSquareLink)
+        };
+      }
+
+      const combinationKey = createCombinationKey(selectedServices);
+      const matchedCombination = combinationLinks[combinationKey];
+
+      if (
+        matchedCombination &&
+        hasRealSquareLink(matchedCombination.squareCheckoutLink)
+      ) {
+        return {
+          checkoutLink: matchedCombination.squareCheckoutLink,
+          isValid: true
+        };
+      }
+
+      return { checkoutLink: "", isValid: false };
+    }
+
+    function resetPendingContractSnapshot() {
+      if (!checkoutSubmissionInProgress) {
+        pendingContractSnapshot = null;
+      }
+
+      hideSaveStatus();
+    }
+
+    function showSaveStatus(message, type = "") {
+      if (!saveStatus) {
+        return;
+      }
+
+      saveStatus.textContent = message;
+      saveStatus.className = "save-status show" + (type ? " " + type : "");
+    }
+
+    function hideSaveStatus() {
+      if (!saveStatus) {
+        return;
+      }
+
+      saveStatus.textContent = "";
+      saveStatus.className = "save-status";
+    }
+
     function renderServiceSections() {
       const categories = getCategories();
 
       serviceSections.innerHTML = categories.map(category => {
         const categoryId = "category-" + slugify(category);
         const inputName = slugify(category);
-        const categoryServices = services.filter(service => service.categoryName === category);
+        const categoryServices = services.filter(
+          service => service.categoryName === category
+        );
 
         return `
           <section class="glass-card selection-card" id="${categoryId}">
@@ -1681,6 +1702,7 @@
                 <h2>${category}</h2>
                 <p class="subtext">${categoryDescriptions[category] || "Choose one option from this category."}</p>
               </div>
+
               <button type="button" class="category-clear" data-category="${category}">
                 Clear Selection
               </button>
@@ -1709,15 +1731,23 @@
       }).join("");
 
       document.querySelectorAll(".service-option").forEach(input => {
-        input.addEventListener("change", updateSummary);
+        input.addEventListener("change", () => {
+          resetPendingContractSnapshot();
+          updateSummary();
+        });
       });
 
       document.querySelectorAll(".category-clear").forEach(button => {
         button.addEventListener("click", () => {
           const category = button.dataset.category;
-          document.querySelectorAll(`.service-option[data-category="${category}"]`).forEach(input => {
-            input.checked = false;
-          });
+
+          document
+            .querySelectorAll(`.service-option[data-category="${category}"]`)
+            .forEach(input => {
+              input.checked = false;
+            });
+
+          resetPendingContractSnapshot();
           updateSummary();
         });
       });
@@ -1725,7 +1755,8 @@
 
     function renderSelectedServices(selectedServices) {
       if (!selectedServices.length) {
-        selectedServicesList.innerHTML = `<div class="summary-empty">No services selected yet.</div>`;
+        selectedServicesList.innerHTML =
+          `<div class="summary-empty">No services selected yet.</div>`;
         return;
       }
 
@@ -1740,35 +1771,24 @@
       `).join("");
     }
 
-    function getCheckoutStatus(selectedServices) {
-      if (!selectedServices.length) {
-        return {
-          checkoutLink: "",
-          isValid: false
-        };
+    function updateCheckoutHelp(isReady) {
+      if (checkoutSubmissionInProgress) {
+        checkoutHelp.textContent =
+          "Saving your signed subscription contract to Google Sheets before checkout...";
+        checkoutHelp.classList.add("show");
+        return;
       }
 
-      if (selectedServices.length === 1) {
-        return {
-          checkoutLink: selectedServices[0].individualSquareLink,
-          isValid: hasRealSquareLink(selectedServices[0].individualSquareLink)
-        };
+      if (!hasRealAppsScriptUrl()) {
+        checkoutHelp.textContent =
+          "Website setup is incomplete. Add your Google Apps Script /exec URL in the HTML.";
+        checkoutHelp.classList.add("show");
+        return;
       }
 
-      const combinationKey = createCombinationKey(selectedServices);
-      const matchedCombination = combinationLinks[combinationKey];
-
-      if (matchedCombination && hasRealSquareLink(matchedCombination.squareCheckoutLink)) {
-        return {
-          checkoutLink: matchedCombination.squareCheckoutLink,
-          isValid: true
-        };
-      }
-
-      return {
-        checkoutLink: "",
-        isValid: false
-      };
+      checkoutHelp.textContent =
+        "Please select a service, add your name and phone number, and agree to the terms before checkout.";
+      checkoutHelp.classList.toggle("show", !isReady);
     }
 
     function updateSummary() {
@@ -1782,17 +1802,220 @@
       renderSelectedServices(selectedServices);
       totalPrice.textContent = formatCurrency(selectedTotal);
 
-      const customerInfoIsValid = isCustomerInfoValid();
       const checkoutIsReady = Boolean(
         selectedServices.length &&
         agreeTerms.checked &&
         checkoutStatus.isValid &&
-        customerInfoIsValid
+        isCustomerInfoValid() &&
+        hasRealAppsScriptUrl()
       );
 
       checkoutButton.disabled = !checkoutIsReady || checkoutSubmissionInProgress;
       updateCheckoutHelp(checkoutIsReady);
     }
+
+    function randomHex(byteCount) {
+      const randomBytes = new Uint8Array(byteCount);
+      crypto.getRandomValues(randomBytes);
+
+      return Array.from(randomBytes)
+        .map(value => value.toString(16).padStart(2, "0"))
+        .join("")
+        .toUpperCase();
+    }
+
+    function generateContractId() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+
+      return `SW-${yyyy}${mm}${dd}-${randomHex(5)}`;
+    }
+
+    function generateRequestId() {
+      return `REQ-${Date.now()}-${randomHex(6)}`;
+    }
+
+    function getNormalizedContractText() {
+      return contractDocument.innerText
+        .replace(/\u00a0/g, " ")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function getReadableLocalDate(isoDate) {
+      const date = new Date(isoDate);
+
+      return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZoneName: "short"
+      }).format(date);
+    }
+
+    function getOrCreateContractSnapshot() {
+      if (pendingContractSnapshot) {
+        return pendingContractSnapshot;
+      }
+
+      const acceptedAtBrowser = new Date().toISOString();
+
+      pendingContractSnapshot = {
+        contractId: generateContractId(),
+        acceptedAtBrowser,
+        acceptedAtLocal: getReadableLocalDate(acceptedAtBrowser)
+      };
+
+      return pendingContractSnapshot;
+    }
+
+    function buildContractRecord() {
+      const selectedServices = getSelectedServices();
+      const selectedTotal = getSelectedTotal(selectedServices);
+      const snapshot = getOrCreateContractSnapshot();
+
+      return {
+        requestId: generateRequestId(),
+        contractId: snapshot.contractId,
+        customerName: customerName.value.trim(),
+        phoneNumber: customerPhone.value.trim(),
+        selectedServiceIds: selectedServices.map(service => service.id),
+        selectedServices: selectedServices.map(service => ({
+          id: service.id,
+          serviceName: service.serviceName,
+          categoryName: service.categoryName,
+          price: roundCurrency(service.price)
+        })),
+        totalPrice: selectedTotal,
+        totalPriceFormatted: formatCurrency(selectedTotal),
+        agreeTerms: agreeTerms.checked ? "Yes" : "No",
+        electronicSignature: customerName.value.trim(),
+        acceptedAtBrowser: snapshot.acceptedAtBrowser,
+        acceptedAtLocal: snapshot.acceptedAtLocal,
+        status: "Accepted / Checkout Started",
+        contractText: getNormalizedContractText(),
+        pageUrl: window.location.href,
+        userAgent: navigator.userAgent
+      };
+    }
+
+    function buildCheckoutUrl(link, contractRecord) {
+      const checkoutUrl = new URL(link, window.location.href);
+
+      // These are matching/reference values only. Square remains responsible
+      // for the actual payment and recurring subscription processing.
+      checkoutUrl.searchParams.set("customer_name", contractRecord.customerName);
+      checkoutUrl.searchParams.set("customer_phone", contractRecord.phoneNumber);
+      checkoutUrl.searchParams.set("original_price", contractRecord.totalPriceFormatted);
+      checkoutUrl.searchParams.set("agreed_to_terms", contractRecord.agreeTerms);
+      checkoutUrl.searchParams.set("contract_id", contractRecord.contractId);
+
+      return checkoutUrl.toString();
+    }
+
+    function populateContractSaveForm(contractRecord) {
+      contractSaveForm.action = APPS_SCRIPT_WEB_APP_URL.trim();
+
+      formRequestId.value = contractRecord.requestId;
+      formContractId.value = contractRecord.contractId;
+      formCustomerName.value = contractRecord.customerName;
+      formPhoneNumber.value = contractRecord.phoneNumber;
+      formSelectedServiceIds.value = JSON.stringify(contractRecord.selectedServiceIds);
+      formAgreeTerms.value = contractRecord.agreeTerms;
+      formElectronicSignature.value = contractRecord.electronicSignature;
+      formAcceptedAtBrowser.value = contractRecord.acceptedAtBrowser;
+      formAcceptedAtLocal.value = contractRecord.acceptedAtLocal;
+      formPageUrl.value = contractRecord.pageUrl;
+      formUserAgent.value = contractRecord.userAgent;
+      formContractText.value = contractRecord.contractText;
+      formWebsite.value = "";
+    }
+
+    function saveContractDirectlyToAppsScript(contractRecord) {
+      if (!hasRealAppsScriptUrl()) {
+        return Promise.reject(
+          new Error("Google Apps Script Web App URL has not been configured in the HTML.")
+        );
+      }
+
+      if (pendingAppsScriptRequest) {
+        return Promise.reject(
+          new Error("A contract save request is already in progress.")
+        );
+      }
+
+      populateContractSaveForm(contractRecord);
+
+      return new Promise((resolve, reject) => {
+        const timeoutId = window.setTimeout(() => {
+          if (
+            pendingAppsScriptRequest &&
+            pendingAppsScriptRequest.requestId === contractRecord.requestId
+          ) {
+            pendingAppsScriptRequest = null;
+            reject(
+              new Error(
+                "Google Sheets did not confirm the save. Please try again."
+              )
+            );
+          }
+        }, 30000);
+
+        pendingAppsScriptRequest = {
+          requestId: contractRecord.requestId,
+          resolve,
+          reject,
+          timeoutId
+        };
+
+        HTMLFormElement.prototype.submit.call(contractSaveForm);
+      });
+    }
+
+    function handleAppsScriptMessage(event) {
+      if (!pendingAppsScriptRequest) {
+        return;
+      }
+
+      // The response must come from the iframe used for the Apps Script form.
+      if (event.source !== contractSaveFrame.contentWindow) {
+        return;
+      }
+
+      const data = event.data;
+
+      if (!data || typeof data !== "object") {
+        return;
+      }
+
+      if (data.type !== "SIGMA_WASH_CONTRACT_SAVE_RESULT") {
+        return;
+      }
+
+      if (data.requestId !== pendingAppsScriptRequest.requestId) {
+        return;
+      }
+
+      const currentRequest = pendingAppsScriptRequest;
+      pendingAppsScriptRequest = null;
+      window.clearTimeout(currentRequest.timeoutId);
+
+      if (data.success) {
+        currentRequest.resolve(data);
+      } else {
+        currentRequest.reject(
+          new Error(data.error || "Google Sheets could not save the contract.")
+        );
+      }
+    }
+
+    window.addEventListener("message", handleAppsScriptMessage);
 
     menuToggle.addEventListener("click", () => {
       if (sidebar.classList.contains("open")) {
@@ -1815,36 +2038,87 @@
     openTerms.addEventListener("click", showTerms);
     closeTerms.addEventListener("click", hideTerms);
     termsOverlay.addEventListener("click", hideTerms);
-    agreeTerms.addEventListener("change", updateSummary);
-    customerName.addEventListener("input", updateSummary);
-    customerPhone.addEventListener("input", updateSummary);
 
-    if (hiddenSheetSubmitFrame) {
-      hiddenSheetSubmitFrame.addEventListener("load", () => {
-        if (sheetSubmissionInProgress) {
-          finishSheetSubmission();
-        }
-      });
-    }
+    agreeTerms.addEventListener("change", () => {
+      resetPendingContractSnapshot();
+      updateSummary();
+    });
+
+    customerName.addEventListener("input", () => {
+      resetPendingContractSnapshot();
+      updateSummary();
+    });
+
+    customerPhone.addEventListener("input", () => {
+      resetPendingContractSnapshot();
+      updateSummary();
+    });
 
     checkoutButton.addEventListener("click", async () => {
-      if (!currentCheckoutIsValid || !currentCheckoutLink || !isCustomerInfoValid() || checkoutSubmissionInProgress) {
+      if (
+        !currentCheckoutIsValid ||
+        !currentCheckoutLink ||
+        !isCustomerInfoValid() ||
+        !agreeTerms.checked ||
+        !hasRealAppsScriptUrl() ||
+        checkoutSubmissionInProgress
+      ) {
+        updateSummary();
         return;
       }
 
       const originalButtonText = checkoutButton.textContent;
+
       checkoutSubmissionInProgress = true;
       checkoutButton.disabled = true;
-      checkoutButton.textContent = "Recording info...";
+      checkoutButton.textContent = "Saving Contract...";
       updateCheckoutHelp(false);
+      showSaveStatus("Saving the full signed contract to Google Sheets...");
 
-      await submitCustomerInfoToSheet();
+      try {
+        const contractRecord = buildContractRecord();
+        const saveResult = await saveContractDirectlyToAppsScript(contractRecord);
 
-      window.location.href = buildCheckoutUrl(currentCheckoutLink);
+        const serverCheckoutUrl = String(saveResult.checkoutUrl || "").trim();
 
-      checkoutButton.textContent = originalButtonText;
-      checkoutSubmissionInProgress = false;
-      updateSummary();
+        if (!hasRealSquareLink(serverCheckoutUrl)) {
+          throw new Error(
+            "The contract was saved, but the Square checkout link returned by Google Apps Script is missing."
+          );
+        }
+
+        showSaveStatus(
+          saveResult.duplicate
+            ? "Contract was already saved. Opening checkout..."
+            : "Contract saved to Google Sheets. Opening checkout...",
+          "success"
+        );
+
+        checkoutButton.textContent = "Opening Checkout...";
+
+        window.location.href = buildCheckoutUrl(
+          serverCheckoutUrl,
+          contractRecord
+        );
+
+      } catch (error) {
+        console.error("Contract save error:", error);
+
+        const readableMessage =
+          error && error.message
+            ? error.message
+            : "The contract could not be saved. Please try again.";
+
+        showSaveStatus(
+          "Checkout was stopped because the contract was not confirmed as saved. " +
+          readableMessage,
+          "error"
+        );
+
+        checkoutSubmissionInProgress = false;
+        checkoutButton.textContent = originalButtonText;
+        updateSummary();
+      }
     });
 
     document.addEventListener("keydown", event => {
@@ -1854,7 +2128,7 @@
       }
     });
 
-        renderServiceSections();
+    renderServiceSections();
     updateSummary();
   </script>
 </body>
