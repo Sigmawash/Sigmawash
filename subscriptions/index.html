@@ -1097,13 +1097,13 @@
   <!--
     DIRECT GOOGLE APPS SCRIPT CONTRACT SUBMISSION
     --------------------------------------------------------------
-    This hidden form posts directly to the Google Apps Script Web App.
-    No intermediary server is used.
+    This form posts directly to the Google Apps Script Web App in the same browser tab.
+    Apps Script saves the contract first, then redirects to Square. No intermediary server is used.
   -->
   <form
     id="contractSaveForm"
     method="post"
-    target="contractSaveFrame"
+    target="_self"
     style="display:none;"
   >
     <input type="hidden" id="formRequestId" name="requestId" />
@@ -1121,12 +1121,6 @@
     <textarea id="formContractText" name="contractText"></textarea>
   </form>
 
-  <iframe
-    id="contractSaveFrame"
-    name="contractSaveFrame"
-    title="Contract save response"
-    style="display:none;"
-  ></iframe>
 
   <div class="terms-modal" id="termsModal" aria-hidden="true">
     <div class="terms-overlay" id="termsOverlay"></div>
@@ -1407,9 +1401,9 @@
       Example:
       https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxxx/exec
 
-      The page submits directly to Google Apps Script.
+      The page submits directly to Google Apps Script. Apps Script saves the contract and then redirects to Square.
     */
-    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzaBwrSI6stmK4L6XxF2GXsyBjj31ZQ0dTN2-Nkh3CUl8YLecFC0oE_BecAGFvQdzjIkQ/exec";
+    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzNceFt24kIqjH-E7sdTV6VQu4qBFZK_b3xUqMihOOWFgmbfSLTd_O9vKK_bs9Yb30W8g/exec";
 
     const services = [
       {
@@ -1525,7 +1519,6 @@
     const contractDocument = document.getElementById("contractDocument");
 
     const contractSaveForm = document.getElementById("contractSaveForm");
-    const contractSaveFrame = document.getElementById("contractSaveFrame");
     const formRequestId = document.getElementById("formRequestId");
     const formContractId = document.getElementById("formContractId");
     const formCustomerName = document.getElementById("formCustomerName");
@@ -1544,7 +1537,6 @@
     let currentCheckoutIsValid = false;
     let checkoutSubmissionInProgress = false;
     let pendingContractSnapshot = null;
-    let pendingAppsScriptRequest = null;
 
     function openSidebar() {
       sidebar.classList.add("open");
@@ -1937,85 +1929,17 @@
       formWebsite.value = "";
     }
 
-    function saveContractDirectlyToAppsScript(contractRecord) {
+    function submitContractDirectlyToAppsScript(contractRecord) {
       if (!hasRealAppsScriptUrl()) {
-        return Promise.reject(
-          new Error("Google Apps Script Web App URL has not been configured in the HTML.")
-        );
-      }
-
-      if (pendingAppsScriptRequest) {
-        return Promise.reject(
-          new Error("A contract save request is already in progress.")
-        );
+        throw new Error("Google Apps Script Web App URL has not been configured in the HTML.");
       }
 
       populateContractSaveForm(contractRecord);
 
-      return new Promise((resolve, reject) => {
-        const timeoutId = window.setTimeout(() => {
-          if (
-            pendingAppsScriptRequest &&
-            pendingAppsScriptRequest.requestId === contractRecord.requestId
-          ) {
-            pendingAppsScriptRequest = null;
-            reject(
-              new Error(
-                "Google Sheets did not confirm the save. Please try again."
-              )
-            );
-          }
-        }, 30000);
-
-        pendingAppsScriptRequest = {
-          requestId: contractRecord.requestId,
-          resolve,
-          reject,
-          timeoutId
-        };
-
-        HTMLFormElement.prototype.submit.call(contractSaveForm);
-      });
+      // Same-tab form POST. Apps Script saves the row first and then redirects
+      // this browser tab to the server-approved Square checkout URL.
+      HTMLFormElement.prototype.submit.call(contractSaveForm);
     }
-
-    function handleAppsScriptMessage(event) {
-      if (!pendingAppsScriptRequest) {
-        return;
-      }
-
-      // The response must come from the iframe used for the Apps Script form.
-      if (event.source !== contractSaveFrame.contentWindow) {
-        return;
-      }
-
-      const data = event.data;
-
-      if (!data || typeof data !== "object") {
-        return;
-      }
-
-      if (data.type !== "SIGMA_WASH_CONTRACT_SAVE_RESULT") {
-        return;
-      }
-
-      if (data.requestId !== pendingAppsScriptRequest.requestId) {
-        return;
-      }
-
-      const currentRequest = pendingAppsScriptRequest;
-      pendingAppsScriptRequest = null;
-      window.clearTimeout(currentRequest.timeoutId);
-
-      if (data.success) {
-        currentRequest.resolve(data);
-      } else {
-        currentRequest.reject(
-          new Error(data.error || "Google Sheets could not save the contract.")
-        );
-      }
-    }
-
-    window.addEventListener("message", handleAppsScriptMessage);
 
     menuToggle.addEventListener("click", () => {
       if (sidebar.classList.contains("open")) {
@@ -2054,7 +1978,7 @@
       updateSummary();
     });
 
-    checkoutButton.addEventListener("click", async () => {
+    checkoutButton.addEventListener("click", () => {
       if (
         !currentCheckoutIsValid ||
         !currentCheckoutLink ||
@@ -2067,8 +1991,6 @@
         return;
       }
 
-      const originalButtonText = checkoutButton.textContent;
-
       checkoutSubmissionInProgress = true;
       checkoutButton.disabled = true;
       checkoutButton.textContent = "Saving Contract...";
@@ -2077,46 +1999,22 @@
 
       try {
         const contractRecord = buildContractRecord();
-        const saveResult = await saveContractDirectlyToAppsScript(contractRecord);
-
-        const serverCheckoutUrl = String(saveResult.checkoutUrl || "").trim();
-
-        if (!hasRealSquareLink(serverCheckoutUrl)) {
-          throw new Error(
-            "The contract was saved, but the Square checkout link returned by Google Apps Script is missing."
-          );
-        }
-
-        showSaveStatus(
-          saveResult.duplicate
-            ? "Contract was already saved. Opening checkout..."
-            : "Contract saved to Google Sheets. Opening checkout...",
-          "success"
-        );
-
-        checkoutButton.textContent = "Opening Checkout...";
-
-        window.location.href = buildCheckoutUrl(
-          serverCheckoutUrl,
-          contractRecord
-        );
-
+        submitContractDirectlyToAppsScript(contractRecord);
       } catch (error) {
-        console.error("Contract save error:", error);
+        console.error("Contract submission error:", error);
 
         const readableMessage =
           error && error.message
             ? error.message
-            : "The contract could not be saved. Please try again.";
+            : "The contract could not be submitted. Please try again.";
 
         showSaveStatus(
-          "Checkout was stopped because the contract was not confirmed as saved. " +
-          readableMessage,
+          "Checkout was stopped. " + readableMessage,
           "error"
         );
 
         checkoutSubmissionInProgress = false;
-        checkoutButton.textContent = originalButtonText;
+        checkoutButton.textContent = "Continue to Checkout";
         updateSummary();
       }
     });
