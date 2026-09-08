@@ -2170,6 +2170,21 @@
       vehicleModelSuggestions.innerHTML = '';
       pendingBookingDetails = null;
     });
+
+      document.addEventListener('DOMContentLoaded', function() {
+    var bookButton = document.getElementById('submitButton');
+    if (bookButton) {
+      bookButton.addEventListener('click', function() {
+        if (!bookButton.disabled) {
+          gtag('event', 'book_now_click', {
+            'button_text': 'Book Now',
+            'form_location': 'booking_form'
+          });
+        }
+      });
+    }
+  });
+    
   </script>
 </body>
 </html>
