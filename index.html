@@ -2142,6 +2142,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       HTMLFormElement.prototype.submit.call(form);
     });
 
+    // Track only bookings explicitly confirmed by the booking Worker.
+    // Required Worker message after a successful save:
+    // { type: 'sigmawash:booking-saved', success: true, confirmationNumber: bookingId }
+    const trackedBookingIds = new Set();
+    window.addEventListener('message', function (event) {
+      if (event.origin !== 'https://sigmawash-booking.quantitativemidwest.workers.dev') return;
+      if (event.source !== hiddenSubmitFrame.contentWindow) return;
+      const message = event.data;
+      if (!message || typeof message !== 'object' ||
+          message.type !== 'sigmawash:booking-saved' ||
+          message.success !== true || !formSubmitted || !pendingBookingDetails) return;
+
+      const bookingId = pendingBookingDetails.confirmationNumber;
+      if (message.confirmationNumber !== bookingId || trackedBookingIds.has(bookingId)) return;
+      trackedBookingIds.add(bookingId);
+
+      const amount = Number(String(pendingBookingDetails.discountedPrice || '')
+        .replace(/[^0-9.]/g, ''));
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'sigma_booking_complete',
+        transaction_id: bookingId,
+        booking_id: bookingId,
+        service_type: pendingBookingDetails.serviceType,
+        value: Number.isFinite(amount) ? amount : 0,
+        currency: 'USD'
+      });
+    });
+
     hiddenSubmitFrame.addEventListener('load', function () {
       if (!formSubmitted || !pendingBookingDetails) return;
 
